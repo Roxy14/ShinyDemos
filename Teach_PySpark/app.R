@@ -533,7 +533,7 @@ df.filter(pl.col('age') > 30)",
                ###############################################
                # STANDARD SQL
                ###############################################
-               h3("SQL (Standard SQL)"),
+               h3("SQL"),
                aceEditor(
                  "code_sql_standard",
                  value = paste(
@@ -630,7 +630,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               h3("Using spark.sql()"),
+               h3("Spark SQL"),
                p("You can run the same SQL directly inside PySpark:"),
                aceEditor(
                  "sql_api_dataframes",
@@ -648,7 +648,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               h3("SQL Equivalent"),
+               h3("SQL"),
                p("Spark DataFrame operations map almost 1‑to‑1 with SQL. If you know SQL, Spark will feel familiar."),
                aceEditor(
                  "sql_dataframes",
@@ -741,7 +741,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               h3("PySpark Example"),
+               h3("PySpark"),
                p("Here, the filter is lazy — Spark waits. The count() is an action, so Spark finally runs the job."),
                aceEditor(
                  "code_transformations",
@@ -761,7 +761,7 @@ df.filter(pl.col('age') > 30)",
                
                
                
-               h3("Using spark.sql()"),
+               h3("Spark SQL"),
                aceEditor(
                  "sql_api_transformations",
                  value = paste(
@@ -777,7 +777,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               h3("SQL Equivalent"),
+               h3("SQL"),
                p("SQL also separates the idea of planning vs executing. A SELECT builds a plan; returning rows is the action."),
                aceEditor(
                  "sql_transformations",
@@ -931,7 +931,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               h3("PySpark Examples"),
+               h3("PySpark"),
                p("Spark uses the same join names as SQL. Here are the most common ones:"),
                aceEditor(
                  "code_joins",
@@ -952,7 +952,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               h3("Using spark.sql()"),
+               h3("Spark SQL"),
                aceEditor(
                  "sql_api_joins",
                  value = paste(
@@ -973,7 +973,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               h3("SQL Equivalent"),
+               h3("SQL"),
                aceEditor(
                  "sql_joins",
                  value = paste(
@@ -1410,7 +1410,7 @@ ORDER BY amount ASC
                ###############################################
                # PYSPARK CODE
                ###############################################
-               h3("PySpark Code (DataFrame API)"),
+               h3("PySpark"),
                aceEditor(
                  "code_string_ops",
                  value = paste(
@@ -1443,7 +1443,7 @@ ORDER BY amount ASC
                ###############################################
                # spark.sql()
                ###############################################
-               h3("Spark SQL Example (spark.sql)"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_string_ops",
                  value = paste(
@@ -1479,7 +1479,7 @@ ORDER BY amount ASC
                ###############################################
                # SQL
                ###############################################
-               h3("SQL String Functions"),
+               h3("SQL"),
                aceEditor(
                  "sql_string_ops",
                  value = paste(
@@ -1514,7 +1514,7 @@ ORDER BY amount ASC
                ###############################################
                # Pandas
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                aceEditor(
                  "pandas_string_ops",
                  value = paste(
@@ -1561,7 +1561,7 @@ ORDER BY amount ASC
                ###############################################
                # Polars
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                aceEditor(
                  "polars_string_ops",
                  value = paste(
@@ -1719,7 +1719,7 @@ ORDER BY amount ASC
                ###############################################
                # PYSPARK CODE
                ###############################################
-               h3("PySpark Code (DataFrame API)"),
+               h3("PySpark"),
                aceEditor(
                  "code_numeric_ops",
                  value = paste(
@@ -1742,7 +1742,7 @@ ORDER BY amount ASC
                ),
                
                
-               h3("Spark SQL Example (spark.sql)"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_numeric_ops",
                  value = paste(
@@ -1790,7 +1790,7 @@ ORDER BY amount ASC
                ),
                
                
-               h3("Pandas Example"),
+               h3("Pandas"),
                aceEditor(
                  "pandas_numeric_ops",
                  value = paste(
@@ -1827,7 +1827,7 @@ ORDER BY amount ASC
                  height = "350px"
                )
                ,
-               h3("Polars Example"),
+               h3("Polars"),
                aceEditor(
                  "polars_numeric_ops",
                  value = paste(
@@ -2027,7 +2027,7 @@ ORDER BY amount ASC
                ###############################################
                # PYSPARK CODE
                ###############################################
-               h3("PySpark Code (DataFrame API)"),
+               h3("PySpark"),
                aceEditor(
                  "code_pyspark_funcs",
                  value = paste(
@@ -2054,7 +2054,7 @@ ORDER BY amount ASC
                ###############################################
                # SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_funcs",
                  value = paste(
@@ -2078,7 +2078,7 @@ ORDER BY amount ASC
                ###############################################
                # PLAIN SQL
                ###############################################
-               h3("Plain SQL Example"),
+               h3("SQL"),
                aceEditor(
                  "plain_sql_funcs",
                  value = paste(
@@ -2101,7 +2101,7 @@ ORDER BY amount ASC
                ###############################################
                # PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                aceEditor(
                  "pandas_funcs",
                  value = paste(
@@ -2128,7 +2128,7 @@ ORDER BY amount ASC
                ###############################################
                # POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                aceEditor(
                  "polars_funcs",
                  value = paste(
@@ -2467,7 +2467,7 @@ ORDER BY amount ASC
                ###############################################
                # 3. STANDARD SQL (Non‑Spark SQL)
                ###############################################
-               h3("SQL (Standard SQL)"),
+               h3("SQL"),
                p("How the same logic looks in ordinary SQL, without Spark’s optimizer."),
                aceEditor(
                  "sql_standard_catalyst",
@@ -2641,7 +2641,7 @@ Project [name#12]
                ###############################################
                # 3. STANDARD SQL
                ###############################################
-               h3("SQL (Standard SQL)"),
+               h3("SQL"),
                p("How the same logic looks in ordinary SQL, without Spark’s execution engine."),
                aceEditor(
                  "sql_standard_tungsten",
@@ -2891,7 +2891,7 @@ Project [name#12, age#10]
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example"),
+               h3("PySpark"),
                aceEditor(
                  "code_partitioning",
                  value = paste(
@@ -2936,7 +2936,7 @@ Project [name#12, age#10]
                ###############################################
                # 3. STANDARD SQL
                ###############################################
-               h3("SQL (Standard SQL)"),
+               h3("SQL"),
                p("How the same logic looks in ordinary SQL, without Spark’s shuffle engine."),
                aceEditor(
                  "sql_standard_partitioning",
@@ -3196,7 +3196,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 3. STANDARD SQL
                ###############################################
-               h3("SQL (Standard SQL)"),
+               h3("SQL"),
                
                aceEditor(
                  "sql_standard_repartition",
@@ -3480,7 +3480,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 3. STANDARD SQL
                ###############################################
-               h3("SQL (Standard SQL)"),
+               h3("SQL"),
                aceEditor(
                  "sql_standard_wide_narrow",
                  value = paste(
