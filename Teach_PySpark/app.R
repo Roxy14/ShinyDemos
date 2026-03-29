@@ -81,13 +81,14 @@ ui <- page_sidebar(
         "String Operations",
         "Numeric Operations",
         "PySpark Functions",
-        "Intermediate: Catalyst Optimizer",
-        "Intermediate: Tungsten Engine",
-        "Intermediate: Partitioning & Shuffling",
-        "Intermediate: Repartitioning Strategy",
-        "Intermediate: Wide vs Narrow Transformations",
-        "Intermediate: Caching & Persistence",
-        "Intermediate: Broadcast Joins",
+        "Import / Export",
+        "Catalyst Optimizer",
+        "Tungsten Engine",
+        "Partitioning & Shuffling",
+        "Repartitioning Strategy",
+        "Wide vs Narrow Transformations",
+        "Caching & Persistence",
+        "Broadcast Joins",
         "Spark DAG Visualizer",
         "Quiz"
       )
@@ -663,7 +664,7 @@ df.filter(pl.col('age') > 30)",
                  height = "180px"
                ),
                
-            
+               
                tags$hr(),
                
                h3("How This Looks in Pandas and Polars"),
@@ -756,9 +757,9 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-
                
-         
+               
+               
                
                h3("Using spark.sql()"),
                aceEditor(
@@ -990,7 +991,7 @@ df.filter(pl.col('age') > 30)",
                  height = "220px"
                ),
                
-
+               
                tags$hr(),
                
                h3("How This Looks in Pandas and Polars"),
@@ -1230,7 +1231,7 @@ ORDER BY amount ASC
                  height = "220px"
                ),
                
-
+               
                
                # -------------------------
                # Pandas
@@ -1507,8 +1508,8 @@ ORDER BY amount ASC
                
                tags$hr(),
                
-
-     
+               
+               
                
                ###############################################
                # Pandas
@@ -1740,7 +1741,7 @@ ORDER BY amount ASC
                  height = "350px"
                ),
                
-          
+               
                h3("Spark SQL Example (spark.sql)"),
                aceEditor(
                  "spark_sql_numeric_ops",
@@ -2150,13 +2151,247 @@ ORDER BY amount ASC
            }
            
            ,
+           "Import / Export" = {
+             tagList(
+               
+               h2("📥📤 Import / Export Across Engines"),
+               
+               p("A concise reference showing how to read and write the most common data formats across PySpark, Spark SQL, SQL, Pandas, and Polars."),
+               
+               tags$hr(),
+               
+               h3("Comparison Table"),
+               HTML("
+      <table style='width:100%;border-collapse:collapse;font-size:14px;color:#eee;'>
+        <tr style='background:#333;'>
+          <th style='padding:8px;border:1px solid #444;'>Format</th>
+          <th style='padding:8px;border:1px solid #444;'>PySpark</th>
+          <th style='padding:8px;border:1px solid #444;'>Spark SQL (PySpark Wrapped)</th>
+          <th style='padding:8px;border:1px solid #444;'>SQL (Standard)</th>
+          <th style='padding:8px;border:1px solid #444;'>Pandas</th>
+          <th style='padding:8px;border:1px solid #444;'>Polars</th>
+        </tr>
+
+        <tr>
+          <td style='padding:6px;border:1px solid #444;'>CSV</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read/write</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ spark.sql(\"\"\")</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ COPY INTO / LOAD DATA</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read_csv / to_csv</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read_csv / write_csv</td>
+        </tr>
+
+        <tr style='background:#2a2a2a;'>
+          <td style='padding:6px;border:1px solid #444;'>Parquet</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read/write</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ spark.sql(\"\"\")</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ External tables</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read_parquet / to_parquet</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read_parquet / write_parquet</td>
+        </tr>
+
+        <tr>
+          <td style='padding:6px;border:1px solid #444;'>JSON</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read/write</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ spark.sql(\"\"\")</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ COPY INTO (varies)</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read_json / to_json</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read_json / write_json</td>
+        </tr>
+
+        <tr style='background:#2a2a2a;'>
+          <td style='padding:6px;border:1px solid #444;'>Delta</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ read/write</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ spark.sql(\"\"\")</td>
+          <td style='padding:6px;border:1px solid #444;'>✖ Not supported</td>
+          <td style='padding:6px;border:1px solid #444;'>✖ Not supported</td>
+          <td style='padding:6px;border:1px solid #444;'>✖ Not supported</td>
+        </tr>
+
+        <tr>
+          <td style='padding:6px;border:1px solid #444;'>Tables</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ spark.table()</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ spark.sql(\"\"\")</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ SELECT * FROM table</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ via ODBC / SQLAlchemy</td>
+          <td style='padding:6px;border:1px solid #444;'>✔ via ODBC / ConnectorX</td>
+        </tr>
+      </table>
+    "),
+               
+               tags$hr(),
+               
+               ###############################################
+               # PYSPARK
+               ###############################################
+               h3("PySpark Import / Export"),
+               aceEditor(
+                 "import_export_pyspark",
+                 value = paste(
+                   "# CSV",
+                   "df = spark.read.csv('file.csv', header=True)",
+                   "df.write.csv('out.csv', header=True)",
+                   "",
+                   "# Parquet",
+                   "df = spark.read.parquet('file.parquet')",
+                   "df.write.parquet('out.parquet')",
+                   "",
+                   "# JSON",
+                   "df = spark.read.json('file.json')",
+                   "df.write.json('out.json')",
+                   "",
+                   "# Delta",
+                   "df = spark.read.format('delta').load('/path/delta')",
+                   "df.write.format('delta').save('/path/delta_out')",
+                   "",
+                   "# Tables",
+                   "df = spark.table('db.table')",
+                   "df.write.saveAsTable('db.new_table')",
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "330px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # SPARK SQL (WRAPPED FOR PYSPARK)
+               ###############################################
+               h3("Spark SQL"),
+               aceEditor(
+                 "import_export_sparksql",
+                 value = paste(
+                   "spark.sql(\"\"\"\n",
+                   "-- CSV",
+                   "CREATE TABLE mycsv",
+                   "USING csv",
+                   "OPTIONS (path 'file.csv', header 'true');\n",
+                   "-- Parquet",
+                   "CREATE TABLE myparquet",
+                   "USING parquet",
+                   "OPTIONS (path 'file.parquet');\n",
+                   "-- JSON",
+                   "CREATE TABLE myjson",
+                   "USING json",
+                   "OPTIONS (path 'file.json');\n",
+                   "-- Delta",
+                   "CREATE TABLE mydelta",
+                   "USING delta",
+                   "LOCATION '/path/delta';\n",
+                   "\"\"\")",
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "420px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # STANDARD SQL
+               ###############################################
+               h3("SQL"),
+               aceEditor(
+                 "import_export_sql",
+                 value = paste(
+                   "-- SQL engines do not read files directly.",
+                   "-- They load data via COPY/LOAD commands.",
+                   "",
+                   "-- PostgreSQL",
+                   "COPY mytable FROM '/path/file.csv' CSV HEADER;",
+                   "",
+                   "-- BigQuery",
+                   "LOAD DATA INTO dataset.table FROM FILES (format='CSV');",
+                   "",
+                   "-- Snowflake",
+                   "COPY INTO mytable FROM @stage/file.csv FILE_FORMAT=(TYPE=CSV);",
+                   sep = "\n"
+                 ),
+                 mode = "sql",
+                 theme = "monokai",
+                 height = "300px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # PANDAS
+               ###############################################
+               h3("Pandas Import / Export"),
+               aceEditor(
+                 "import_export_pandas",
+                 value = paste(
+                   "import pandas as pd",
+                   "",
+                   "# CSV",
+                   "df = pd.read_csv('file.csv')",
+                   "df.to_csv('out.csv', index=False)",
+                   "",
+                   "# Parquet",
+                   "df = pd.read_parquet('file.parquet')",
+                   "df.to_parquet('out.parquet')",
+                   "",
+                   "# JSON",
+                   "df = pd.read_json('file.json')",
+                   "df.to_json('out.json', orient='records')",
+                   "",
+                   "# ODBC / Databases",
+                   "import pyodbc",
+                   "conn = pyodbc.connect('DSN=mydb')",
+                   "df = pd.read_sql('SELECT * FROM table', conn)",
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "350px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # POLARS
+               ###############################################
+               h3("Polars Import / Export"),
+               aceEditor(
+                 "import_export_polars",
+                 value = paste(
+                   "import polars as pl",
+                   "",
+                   "# CSV",
+                   "df = pl.read_csv('file.csv')",
+                   "df.write_csv('out.csv')",
+                   "",
+                   "# Parquet",
+                   "df = pl.read_parquet('file.parquet')",
+                   "df.write_parquet('out.parquet')",
+                   "",
+                   "# JSON",
+                   "df = pl.read_json('file.json')",
+                   "df.write_json('out.json')",
+                   "",
+                   "# ODBC / Databases (via ConnectorX)",
+                   "import connectorx as cx",
+                   "df = pl.from_pandas(cx.read_sql('DSN=mydb', 'SELECT * FROM table'))",
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "360px"
+               )
+             )
+           }
            
            
+           
+           ,
            
            # --------------------------------------------------
-           # INTERMEDIATE: Catalyst Optimizer
+           # Catalyst Optimizer
            # --------------------------------------------------
-           "Intermediate: Catalyst Optimizer" = {
+           "Catalyst Optimizer" = {
              tagList(
                
                h2("🧠 Catalyst Optimizer"),
@@ -2188,7 +2423,7 @@ ORDER BY amount ASC
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example (Shows Catalyst in Action)"),
+               h3("PySpark (Shows Catalyst in Action)"),
                aceEditor(
                  "code_catalyst",
                  value = paste(
@@ -2211,7 +2446,7 @@ ORDER BY amount ASC
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_catalyst",
                  value = paste(
@@ -2252,7 +2487,7 @@ ORDER BY amount ASC
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                aceEditor(
                  "pandas_catalyst",
                  value = paste(
@@ -2274,7 +2509,7 @@ ORDER BY amount ASC
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                aceEditor(
                  "polars_catalyst",
                  value = paste(
@@ -2323,9 +2558,9 @@ Project [name#12]
            ,
            
            # --------------------------------------------------
-           # INTERMEDIATE: Tungsten Engine
+           # Tungsten Engine
            # --------------------------------------------------
-           "Intermediate: Tungsten Engine" = {
+           "Tungsten Engine" = {
              tagList(
                
                h2("⚡ Tungsten Engine"),
@@ -2363,7 +2598,7 @@ Project [name#12]
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example (Shows Tungsten Physical Plan)"),
+               h3("PySpark (Shows Tungsten Physical Plan)"),
                aceEditor(
                  "code_tungsten",
                  value = paste(
@@ -2386,7 +2621,7 @@ Project [name#12]
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_tungsten",
                  value = paste(
@@ -2425,7 +2660,7 @@ Project [name#12]
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                aceEditor(
                  "pandas_tungsten",
                  value = paste(
@@ -2447,7 +2682,7 @@ Project [name#12]
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                aceEditor(
                  "polars_tungsten",
                  value = paste(
@@ -2499,9 +2734,9 @@ Project [name#12, age#10]
            
            
            # --------------------------------------------------
-           # INTERMEDIATE: Partitioning & Shuffling
+           # Partitioning & Shuffling
            # --------------------------------------------------
-           "Intermediate: Partitioning & Shuffling" = {
+           "Partitioning & Shuffling" = {
              tagList(
                
                h2("📦 Partitioning & Shuffling"),
@@ -2680,7 +2915,7 @@ Project [name#12, age#10]
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_partitioning",
                  value = paste(
@@ -2721,7 +2956,7 @@ Project [name#12, age#10]
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                aceEditor(
                  "pandas_partitioning",
                  value = paste(
@@ -2743,7 +2978,7 @@ Project [name#12, age#10]
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                aceEditor(
                  "polars_partitioning",
                  value = paste(
@@ -2774,7 +3009,7 @@ Project [name#12, age#10]
            # --------------------------------------------------
            # NEW: Repartitioning Strategy
            # --------------------------------------------------
-           "Intermediate: Repartitioning Strategy" = {
+           "Repartitioning Strategy" = {
              tagList(
                
                h2("📊 Repartitioning Strategy"),
@@ -2906,7 +3141,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example: Repartitioning + Salting"),
+               h3("PySpark: Repartitioning + Salting"),
                
                aceEditor(
                  "code_repartition",
@@ -2939,7 +3174,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                
                aceEditor(
                  "spark_sql_repartition",
@@ -2984,7 +3219,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                
                aceEditor(
                  "pandas_repartition",
@@ -3007,7 +3242,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                
                aceEditor(
                  "polars_repartition",
@@ -3064,9 +3299,9 @@ Partition 7: ████████ 450k
            
            
            # --------------------------------------------------
-           # INTERMEDIATE: Wide vs Narrow Transformations
+           # Wide vs Narrow Transformations
            # --------------------------------------------------
-           "Intermediate: Wide vs Narrow Transformations" = {
+           "Wide vs Narrow Transformations" = {
              tagList(
                
                h2("🛣 Wide vs Narrow Transformations"),
@@ -3196,7 +3431,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example"),
+               h3("PySpark"),
                aceEditor(
                  "code_wide_narrow",
                  value = paste(
@@ -3218,7 +3453,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_wide_narrow",
                  value = paste(
@@ -3267,7 +3502,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                aceEditor(
                  "pandas_wide_narrow",
                  value = paste(
@@ -3293,7 +3528,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                aceEditor(
                  "polars_wide_narrow",
                  value = paste(
@@ -3324,9 +3559,9 @@ Partition 7: ████████ 450k
            ,
            
            # --------------------------------------------------
-           # INTERMEDIATE: Caching & Persistence
+           # Caching & Persistence
            # --------------------------------------------------
-           "Intermediate: Caching & Persistence" = {
+           "Caching & Persistence" = {
              tagList(
                
                h2("💾 Caching & Persistence"),
@@ -3341,7 +3576,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example"),
+               h3("PySpark"),
                aceEditor(
                  "code_cache",
                  value = paste(
@@ -3366,7 +3601,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                aceEditor(
                  "spark_sql_cache",
                  value = paste(
@@ -3384,7 +3619,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 3. STANDARD SQL
                ###############################################
-               h3("SQL Examples (Databricks + Standard SQL)"),
+               h3("SQL"),
                aceEditor(
                  "sql_cache_combined",
                  value = paste(
@@ -3425,7 +3660,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                p("Pandas has no built‑in caching, but you can simulate it by storing intermediate results in memory."),
                aceEditor(
                  "pandas_cache",
@@ -3452,7 +3687,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                p("Polars does not have a cache API, but lazy execution lets Polars reuse optimized query plans."),
                aceEditor(
                  "polars_cache",
@@ -3483,9 +3718,9 @@ Partition 7: ████████ 450k
            
            
            # --------------------------------------------------
-           # INTERMEDIATE: Broadcast Joins
+           # Broadcast Joins
            # --------------------------------------------------
-           "Intermediate: Broadcast Joins" = {
+           "Broadcast Joins" = {
              tagList(
                
                h2("📡 Broadcast Joins"),
@@ -3637,7 +3872,7 @@ Executor 3 receives dim_df (3 rows)
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example"),
+               h3("PySpark"),
                
                aceEditor(
                  "code_broadcast",
@@ -3661,7 +3896,7 @@ Executor 3 receives dim_df (3 rows)
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                
                aceEditor(
                  "spark_sql_broadcast",
@@ -3685,7 +3920,7 @@ Executor 3 receives dim_df (3 rows)
                ###############################################
                # 3. SQL (Databricks + Standard SQL)
                ###############################################
-               h3("SQL Examples"),
+               h3("SQL"),
                
                aceEditor(
                  "sql_broadcast_combined",
@@ -3747,7 +3982,7 @@ Executor 3 receives dim_df (3 rows)
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                
                aceEditor(
                  "pandas_broadcast",
@@ -3773,7 +4008,7 @@ Executor 3 receives dim_df (3 rows)
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                
                aceEditor(
                  "polars_broadcast",
@@ -3922,7 +4157,7 @@ df4.show()                            # action
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark Example"),
+               h3("PySpark"),
                
                aceEditor(
                  "code_dag",
@@ -3945,7 +4180,7 @@ df4.show()                            # action
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL Example"),
+               h3("Spark SQL"),
                
                aceEditor(
                  "spark_sql_dag",
@@ -3968,7 +4203,7 @@ df4.show()                            # action
                ###############################################
                # 3. SQL (Databricks + Standard SQL)
                ###############################################
-               h3("SQL Examples"),
+               h3("SQL"),
                
                aceEditor(
                  "sql_dag_combined",
@@ -4009,7 +4244,7 @@ df4.show()                            # action
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas Example"),
+               h3("Pandas"),
                
                aceEditor(
                  "pandas_dag",
@@ -4035,7 +4270,7 @@ df4.show()                            # action
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars Example"),
+               h3("Polars"),
                
                aceEditor(
                  "polars_dag",
