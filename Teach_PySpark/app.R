@@ -1631,36 +1631,36 @@ ORDER BY amount ASC
                    style = "font-size:12px;",
                    
                    # ABS
-                   div(style="margin-bottom:12px;",
-                       h4("1. abs(x) — Absolute value"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","1. abs(x) — Absolute value"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>-12</b> → <span style='color:#4da6ff;'>12</span><br>
                   <b>7</b> → <span style='color:#4da6ff;'>7</span>")
                        )
                    ),
                    
                    # ROUND
-                   div(style="margin-bottom:12px;",
-                       h4("2. round(x, n) — Round to n decimals"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","2. round(x, n) — Round to n decimals"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>12.3456</b> → <span style='color:#4da6ff;'>12.35</span><br>
                   <b>9.876</b> → <span style='color:#4da6ff;'>9.88</span>")
                        )
                    ),
                    
                    # FLOOR
-                   div(style="margin-bottom:12px;",
-                       h4("3. floor(x) — Round down"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","3. floor(x) — Round down"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>7.9</b> → <span style='color:#4da6ff;'>7</span><br>
                   <b>3.1</b> → <span style='color:#4da6ff;'>3</span>")
                        )
                    ),
                    
                    # CEIL
-                   div(style="margin-bottom:12px;",
-                       h4("4. ceil(x) — Round up"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","4. ceil(x) — Round up"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>7.1</b> → <span style='color:#4da6ff;'>8</span><br>
                   <b>3.9</b> → <span style='color:#4da6ff;'>4</span>")
                        )
@@ -1675,42 +1675,43 @@ ORDER BY amount ASC
                    style = "font-size:12px;",
                    
                    # POW
-                   div(style="margin-bottom:12px;",
-                       h4("5. pow(x, y) — x to the power of y"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","5. pow(x, y) — x to the power of y"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>2^3</b> → <span style='color:#4da6ff;'>8</span><br>
                   <b>5^2</b> → <span style='color:#4da6ff;'>25</span>")
                        )
                    ),
                    
                    # SQRT
-                   div(style="margin-bottom:12px;",
-                       h4("6. sqrt(x) — Square root"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","6. sqrt(x) — Square root"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>25</b> → <span style='color:#4da6ff;'>5</span><br>
                   <b>9</b> → <span style='color:#4da6ff;'>3</span>")
                        )
                    ),
                    
                    # LOG
-                   div(style="margin-bottom:12px;",
-                       h4("7. log(x) — Natural log"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","7. log(x) — Natural log"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>1</b> → <span style='color:#4da6ff;'>0</span><br>
                   <b>e</b> → <span style='color:#4da6ff;'>1</span>")
                        )
                    ),
                    
                    # COALESCE
-                   div(style="margin-bottom:12px;",
-                       h4("8. coalesce(x, y) — First non-null"),
-                       div(style="background:#222;padding:6px;border-radius:6px;",
+                   div(style="margin-bottom:8px;",
+                       h4(style="margin-bottom:4px;","8. coalesce(x, y) — First non-null"),
+                       div(style="background:#222;padding:4px 6px;border-radius:4px;",
                            HTML("<b>null, 5</b> → <span style='color:#4da6ff;'>5</span><br>
                   <b>null, null, 9</b> → <span style='color:#4da6ff;'>9</span>")
                        )
                    )
                  )
-               ),
+               )
+               ,
                
                tags$hr(),
                
@@ -1874,85 +1875,70 @@ ORDER BY amount ASC
                    width = 6,
                    style = "font-size:12px;",
                    
-                   #################################################
                    # 1. col()
-                   #################################################
-                   h4("1. col('x') — Reference a column"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","1. col('x') — Reference a column"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x<br>
-            10<br><br>
-
-            <b>After</b><br>
-            col('x') simply refers to the column — no change.
-          ")
+          <b>Before</b><br>
+          x<br>
+          10<br><br>
+          <b>After</b><br>
+          col('x') simply refers to the column — no change.
+        ")
                    ),
                    
-                   #################################################
                    # 2. lit()
-                   #################################################
-                   h4("2. lit(value) — Create a constant column"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","2. lit(value) — Create a constant column"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x<br>
-            10<br><br>
-
-            <b>After</b><br>
-            x | constant<br>
-            10 | <span style='color:#4da6ff;'>5</span>
-          ")
+          <b>Before</b><br>
+          x<br>
+          10<br><br>
+          <b>After</b><br>
+          x | constant<br>
+          10 | <span style='color:#4da6ff;'>5</span>
+        ")
                    ),
                    
-                   #################################################
-                   # 3. when() / otherwise()
-                   #################################################
-                   h4("3. when() / otherwise() — IF logic"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   # 3. when()
+                   h4(style="margin-bottom:4px;","3. when() / otherwise() — IF logic"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x<br>
-            5<br>
-            20<br><br>
-
-            <b>After</b><br>
-            x | size_label<br>
-            5 | <span style='color:#4da6ff;'>small</span><br>
-            20 | <span style='color:#4da6ff;'>large</span>
-          ")
+          <b>Before</b><br>
+          x<br>
+          5<br>
+          20<br><br>
+          <b>After</b><br>
+          x | size_label<br>
+          5 | <span style='color:#4da6ff;'>small</span><br>
+          20 | <span style='color:#4da6ff;'>large</span>
+        ")
                    ),
                    
-                   #################################################
                    # 4. expr()
-                   #################################################
-                   h4("4. expr() — SQL inside PySpark"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","4. expr() — SQL inside PySpark"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x<br>
-            10<br><br>
-
-            <b>After (expr('x + 5'))</b><br>
-            x | x_plus_5<br>
-            10 | <span style='color:#4da6ff;'>15</span>
-          ")
+          <b>Before</b><br>
+          x<br>
+          10<br><br>
+          <b>After (expr('x + 5'))</b><br>
+          x | x_plus_5<br>
+          10 | <span style='color:#4da6ff;'>15</span>
+        ")
                    ),
                    
-                   #################################################
                    # 5. withColumn()
-                   #################################################
-                   h4("5. withColumn() — Add or replace a column"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","5. withColumn() — Add or replace a column"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x<br>
-            10<br><br>
-
-            <b>After</b><br>
-            x | x_plus_5<br>
-            10 | <span style='color:#4da6ff;'>15</span>
-          ")
+          <b>Before</b><br>
+          x<br>
+          10<br><br>
+          <b>After</b><br>
+          x | x_plus_5<br>
+          10 | <span style='color:#4da6ff;'>15</span>
+        ")
                    )
                  ),
                  
@@ -1963,91 +1949,77 @@ ORDER BY amount ASC
                    width = 6,
                    style = "font-size:12px;",
                    
-                   #################################################
                    # 6. select()
-                   #################################################
-                   h4("6. select() — Choose columns"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","6. select() — Choose columns"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x | y | z<br>
-            1 | 2 | 3<br><br>
-
-            <b>After (select x,y)</b><br>
-            x | y<br>
-            1 | 2
-          ")
+          <b>Before</b><br>
+          x | y | z<br>
+          1 | 2 | 3<br><br>
+          <b>After (select x,y)</b><br>
+          x | y<br>
+          1 | 2
+        ")
                    ),
                    
-                   #################################################
                    # 7. filter()
-                   #################################################
-                   h4("7. filter() — Keep only matching rows"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","7. filter() — Keep only matching rows"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x<br>
-            5<br>
-            12<br><br>
-
-            <b>After (x > 10)</b><br>
-            x<br>
-            <span style='color:#4da6ff;'>12</span>
-          ")
+          <b>Before</b><br>
+          x<br>
+          5<br>
+          12<br><br>
+          <b>After (x > 10)</b><br>
+          x<br>
+          <span style='color:#4da6ff;'>12</span>
+        ")
                    ),
                    
-                   #################################################
                    # 8. groupBy().agg()
-                   #################################################
-                   h4("8. groupBy().agg() — Aggregations"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","8. groupBy().agg() — Aggregations"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            category | x<br>
-            A | 5<br>
-            A | 7<br><br>
-
-            <b>After (sum)</b><br>
-            category | total_x<br>
-            A | <span style='color:#4da6ff;'>12</span>
-          ")
+          <b>Before</b><br>
+          category | x<br>
+          A | 5<br>
+          A | 7<br><br>
+          <b>After (sum)</b><br>
+          category | total_x<br>
+          A | <span style='color:#4da6ff;'>12</span>
+        ")
                    ),
                    
-                   #################################################
                    # 9. explode()
-                   #################################################
-                   h4("9. explode() — Turn array elements into rows"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","9. explode() — Turn array elements into rows"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            items<br>
-            [1,2,3]<br><br>
-
-            <b>After (explode)</b><br>
-            items<br>
-            <span style='color:#4da6ff;'>1</span><br>
-            <span style='color:#4da6ff;'>2</span><br>
-            <span style='color:#4da6ff;'>3</span>
-          ")
+          <b>Before</b><br>
+          items<br>
+          [1,2,3]<br><br>
+          <b>After (explode)</b><br>
+          items<br>
+          <span style='color:#4da6ff;'>1</span><br>
+          <span style='color:#4da6ff;'>2</span><br>
+          <span style='color:#4da6ff;'>3</span>
+        ")
                    ),
                    
-                   #################################################
                    # 10. array() / struct()
-                   #################################################
-                   h4("10. array() / struct() — Build complex types"),
-                   div(style="background:#222;padding:6px;border-radius:6px;",
+                   h4(style="margin-bottom:4px;","10. array() / struct() — Build complex types"),
+                   div(style="background:#222;padding:4px 6px;border-radius:4px;margin-bottom:8px;",
                        HTML("
-            <b>Before</b><br>
-            x | y<br>
-            1 | 2<br><br>
-
-            <b>After</b><br>
-            array → <span style='color:#4da6ff;'>[1,2]</span><br>
-            struct → <span style='color:#4da6ff;'>{x:1, y:2}</span>
-          ")
+          <b>Before</b><br>
+          x | y<br>
+          1 | 2<br><br>
+          <b>After</b><br>
+          array → <span style='color:#4da6ff;'>[1,2]</span><br>
+          struct → <span style='color:#4da6ff;'>{x:1, y:2}</span>
+        ")
                    )
                  )
-               ),
+               )
+               ,
                
                tags$hr(),
                
