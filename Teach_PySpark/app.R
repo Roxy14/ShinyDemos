@@ -23,8 +23,8 @@ ui <- page_sidebar(
     tags$style(HTML("
       /* Code editor improvements */
       .ace_editor {
-        min-height: 120px !important;
-        max-height: 550px !important;
+        min-height: 80px !important;
+        max-height: 800px !important;
         font-size: 14px !important;
         border-radius: 6px !important;
       }
@@ -77,6 +77,7 @@ ui <- page_sidebar(
         "DataFrames",
         "Transformations vs Actions",
         "Joins",
+        "Broadcast Joins",
         "Window Functions",
         "String Operations",
         "Numeric Operations",
@@ -88,7 +89,6 @@ ui <- page_sidebar(
         "Repartitioning Strategy",
         "Wide vs Narrow Transformations",
         "Caching & Persistence",
-        "Broadcast Joins",
         "Spark DAG Visualizer",
         "Quiz"
       )
@@ -1019,7 +1019,338 @@ df.filter(pl.col('age') > 30)",
              )
            }
            
+           ,
            
+           # --------------------------------------------------
+           # Broadcast Joins
+           # --------------------------------------------------
+           "Broadcast Joins" = {
+             tagList(
+               
+               h2("📡 Broadcast Joins"),
+               
+               p("Broadcast joins send a small table to every executor, avoiding shuffles of the large table. 
+       This is one of the most powerful performance optimizations in Spark."),
+               
+               h3("Broadcast Join Concepts"),
+               DTOutput("broadcast_table"),
+               
+               tags$hr(),
+               
+               ###############################################
+               # EXAMPLE DATASET (DARK MODE)
+               ###############################################
+               h3("Example Data"),
+               
+               HTML("
+      <div style='background:#222;border:1px solid #444;border-radius:8px;
+                  padding:15px;width:75%;margin:auto;color:#eee;'>
+
+        <b>Large Fact Table (fact_df)</b> — 10 million rows<br><br>
+
+        <table style='border-collapse:collapse;width:100%;margin-bottom:20px;color:#eee;'>
+          <tr style='background:#333;'>
+            <th style='padding:6px;border:1px solid #555;'>id</th>
+            <th style='padding:6px;border:1px solid #555;'>amount</th>
+            <th style='padding:6px;border:1px solid #555;'>country</th>
+          </tr>
+          <tr><td style='padding:6px;border:1px solid #555;'>1</td><td style='padding:6px;border:1px solid #555;'>100</td><td style='padding:6px;border:1px solid #555;'>US</td></tr>
+          <tr><td style='padding:6px;border:1px solid #555;'>2</td><td style='padding:6px;border:1px solid #555;'>250</td><td style='padding:6px;border:1px solid #555;'>UK</td></tr>
+          <tr><td style='padding:6px;border:1px solid #555;'>3</td><td style='padding:6px;border:1px solid #555;'>300</td><td style='padding:6px;border:1px solid #555;'>IN</td></tr>
+        </table>
+
+        <b>Small Dimension Table (dim_df)</b> — 3 rows<br><br>
+
+        <table style='border-collapse:collapse;width:100%;color:#eee;'>
+          <tr style='background:#333;'>
+            <th style='padding:6px;border:1px solid #555;'>id</th>
+            <th style='padding:6px;border:1px solid #555;'>category</th>
+          </tr>
+          <tr><td style='padding:6px;border:1px solid #555;'>1</td><td style='padding:6px;border:1px solid #555;'>A</td></tr>
+          <tr><td style='padding:6px;border:1px solid #555;'>2</td><td style='padding:6px;border:1px solid #555;'>B</td></tr>
+          <tr><td style='padding:6px;border:1px solid #555;'>3</td><td style='padding:6px;border:1px solid #555;'>C</td></tr>
+        </table>
+      </div>
+    "),
+               
+               tags$hr(),
+               
+               ###############################################
+               # SHUFFLE JOIN
+               ###############################################
+               h3("❌ Shuffle Join (No Broadcast)"),
+               
+               p("Without broadcast, Spark must shuffle both tables so matching keys end up in the same partition."),
+               
+               HTML("
+      <div style='background:#2a1f1f;border:1px solid #553333;border-radius:8px;
+                  padding:20px;width:85%;margin:auto;color:#eee;'>
+
+        <b>Before Join:</b><br><br>
+
+        <table style='border-collapse:collapse;width:100%;margin-bottom:10px;color:#eee;'>
+          <tr style='background:#5a2d2d;'>
+            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 0</th>
+            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 1</th>
+          </tr>
+          <tr>
+            <td style='padding:8px;border:1px solid #555;'>id: 1, 3, 7, ...</td>
+            <td style='padding:8px;border:1px solid #555;'>id: 2, 4, 8, ...</td>
+          </tr>
+        </table>
+
+        <table style='border-collapse:collapse;width:100%;color:#eee;'>
+          <tr style='background:#5a2d2d;'>
+            <th style='padding:6px;border:1px solid #555;'>dim_df Partition 0</th>
+            <th style='padding:6px;border:1px solid #555;'>dim_df Partition 1</th>
+          </tr>
+          <tr>
+            <td style='padding:8px;border:1px solid #555;'>id: 1, 2</td>
+            <td style='padding:8px;border:1px solid #555;'>id: 3</td>
+          </tr>
+        </table>
+
+        <p style='margin-top:15px;'><b>After Shuffle:</b></p>
+
+        <pre style='font-size:14px;background:#1a1a1a;color:#eee;border:1px solid #444;padding:10px;border-radius:6px;'>
+fact_df → shuffled
+dim_df → shuffled
+Both tables must be reorganized by key.
+        </pre>
+
+        <p style='font-style:italic;color:#ff7777;margin-top:10px;'>
+          Shuffle join = expensive, slow, and unnecessary when one table is tiny.
+        </p>
+      </div>
+    "),
+               
+               tags$hr(),
+               
+               ###############################################
+               # BROADCAST JOIN
+               ###############################################
+               h3("✅ Broadcast Join (Fast, No Shuffle)"),
+               
+               p("Spark sends the small table to every executor. The large table stays where it is — no shuffle."),
+               
+               HTML("
+      <div style='background:#1e3321;border:1px solid #335533;border-radius:8px;
+                  padding:20px;width:85%;margin:auto;color:#eee;'>
+
+        <b>Broadcasting dim_df to all executors:</b><br><br>
+
+        <pre style='font-size:14px;background:#1a1a1a;color:#eee;border:1px solid #444;padding:10px;border-radius:6px;'>
+Executor 1 receives dim_df (3 rows)
+Executor 2 receives dim_df (3 rows)
+Executor 3 receives dim_df (3 rows)
+...
+        </pre>
+
+        <p style='margin-top:15px;'><b>Join happens locally:</b></p>
+
+        <table style='border-collapse:collapse;width:100%;color:#eee;'>
+          <tr style='background:#2d5533;'>
+            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 0</th>
+            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 1</th>
+          </tr>
+          <tr>
+            <td style='padding:8px;border:1px solid #555;'>
+              id: 1 → join with dim_df<br>
+              id: 3 → join with dim_df
+            </td>
+            <td style='padding:8px;border:1px solid #555;'>
+              id: 2 → join with dim_df<br>
+              id: 4 → join with dim_df
+            </td>
+          </tr>
+        </table>
+
+        <p style='font-style:italic;color:#99ff99;margin-top:10px;'>
+          Broadcast join = no shuffle, fast, ideal for small dimension tables.
+        </p>
+      </div>
+    "),
+               
+               tags$hr(),
+               
+               ###############################################
+               # 1. PYSPARK
+               ###############################################
+               h3("PySpark"),
+               
+               aceEditor(
+                 "code_broadcast",
+                 value = paste(
+                   "from pyspark.sql.functions import broadcast",
+                   "",
+                   "# Broadcast the small dimension table",
+                   "df_joined = fact_df.join(broadcast(dim_df), on='id', how='inner')",
+                   "",
+                   "# Without broadcast (shuffle)",
+                   "df_joined2 = fact_df.join(dim_df, on='id', how='inner')",
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "200px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # 2. SPARK SQL
+               ###############################################
+               h3("Spark SQL"),
+               
+               aceEditor(
+                 "spark_sql_broadcast",
+                 value = paste(
+                   'spark.sql("""',
+                   "SELECT /*+ BROADCAST(dim_df) */",
+                   "  f.*, d.category",
+                   "FROM fact_df f",
+                   "JOIN dim_df d",
+                   "ON f.id = d.id",
+                   '""")',
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "150px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # 3. SQL (Databricks + Standard SQL)
+               ###############################################
+               h3("SQL"),
+               
+               aceEditor(
+                 "sql_broadcast_combined",
+                 value = paste(
+                   "-- =====================================================",
+                   "-- Databricks / Spark SQL (REAL BROADCAST JOIN)",
+                   "-- =====================================================",
+                   "",
+                   "SELECT /*+ BROADCAST(dim_df) */",
+                   "  f.*, d.category",
+                   "FROM fact_df f",
+                   "JOIN dim_df d",
+                   "ON f.id = d.id;",
+                   "",
+                   "",
+                   "-- =====================================================",
+                   "-- Other SQL Engines with JOIN HINTS",
+                   "-- (Oracle, BigQuery, Snowflake, Presto/Trino, etc.)",
+                   "-- =====================================================",
+                   "",
+                   "-- Oracle-style hint",
+                   "SELECT /*+ USE_NL(d) */",
+                   "  f.*, d.category",
+                   "FROM fact_df f",
+                   "JOIN dim_df d",
+                   "ON f.id = d.id;",
+                   "",
+                   "-- BigQuery hint",
+                   "SELECT f.*, d.category",
+                   "FROM fact_df f",
+                   "JOIN dim_df d",
+                   "ON f.id = d.id",
+                   "OPTIONS (broadcast_join = true);",
+                   "",
+                   "",
+                   "-- =====================================================",
+                   "-- Standard ANSI SQL (NO broadcast join feature)",
+                   "-- Closest equivalent: TEMP TABLE for small dimension",
+                   "-- =====================================================",
+                   "",
+                   "CREATE TEMP TABLE dim_small AS",
+                   "SELECT * FROM dim_df;",
+                   "",
+                   "SELECT f.*, d.category",
+                   "FROM fact_df f",
+                   "JOIN dim_small d",
+                   "ON f.id = d.id;",
+                   "",
+                   "-- This avoids recomputing dim_df, but is NOT a broadcast join.",
+                   sep = "\n"
+                 ),
+                 mode = "sql",
+                 theme = "monokai",
+                 height = "2000px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # 4. PANDAS
+               ###############################################
+               h3("Pandas"),
+               
+               aceEditor(
+                 "pandas_broadcast",
+                 value = paste(
+                   "import pandas as pd",
+                   "",
+                   "fact_df = pd.read_csv('fact.csv')",
+                   "dim_df = pd.read_csv('dim.csv')",
+                   "",
+                   "# Pandas automatically keeps small tables in memory",
+                   "# Equivalent to broadcast join because dim_df is tiny",
+                   "",
+                   "df_joined = fact_df.merge(dim_df, on='id', how='inner')",
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "200px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # 5. POLARS
+               ###############################################
+               h3("Polars"),
+               
+               aceEditor(
+                 "polars_broadcast",
+                 value = paste(
+                   "import polars as pl",
+                   "",
+                   "fact_df = pl.read_csv('fact.csv')",
+                   "dim_df = pl.read_csv('dim.csv')",
+                   "",
+                   "# Polars automatically keeps small tables in memory",
+                   "# Equivalent to broadcast join behavior",
+                   "",
+                   "df_joined = fact_df.join(dim_df, on='id', how='inner')",
+                   sep = "\n"
+                 ),
+                 mode = "python",
+                 theme = "monokai",
+                 height = "200px"
+               ),
+               
+               tags$hr(),
+               
+               ###############################################
+               # SUMMARY
+               ###############################################
+               h3("Summary"),
+               
+               HTML("
+      <div style='border:1px solid #444;padding:15px;width:80%;border-radius:8px;
+                  background:#222;margin:auto;color:#eee;'>
+        <b>Broadcast Join:</b> Small table sent to all executors → no shuffle<br>
+        <b>Shuffle Join:</b> Both tables shuffled → expensive<br><br>
+
+        <b>Rule of thumb:</b> Broadcast when small table < 500MB<br>
+      </div>
+    ")
+             )
+           }
            
            
            
@@ -1437,7 +1768,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "550px"
+                 height = "350px"
                ),
                tags$hr(),
                ###############################################
@@ -1469,7 +1800,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "450px"
+                 height = "350px"
                )
                
                ,
@@ -1503,7 +1834,7 @@ ORDER BY amount ASC
                  ),
                  mode = "sql",
                  theme = "monokai",
-                 height = "450px"
+                 height = "300px"
                ),
                
                tags$hr(),
@@ -1553,7 +1884,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "450px"
+                 height = "550px"
                ),
                
                tags$hr(),
@@ -1602,7 +1933,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "450px"
+                 height = "600px"
                )
              )
            }
@@ -1738,7 +2069,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "350px"
+                 height = "250px"
                ),
                
                
@@ -1762,7 +2093,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "350px"
+                 height = "250px"
                )
                ,
                ###############################################
@@ -1786,7 +2117,7 @@ ORDER BY amount ASC
                  ),
                  mode = "sql",
                  theme = "monokai",
-                 height = "300px"
+                 height = "250px"
                ),
                
                
@@ -1824,7 +2155,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "350px"
+                 height = "500px"
                )
                ,
                h3("Polars"),
@@ -1847,7 +2178,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "380px"
+                 height = "250px"
                )
                
              )
@@ -2046,7 +2377,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "350px"
+                 height = "250px"
                ),
                
                tags$hr(),
@@ -2070,7 +2401,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "350px"
+                 height = "225px"
                ),
                
                tags$hr(),
@@ -2093,7 +2424,7 @@ ORDER BY amount ASC
                  ),
                  mode = "sql",
                  theme = "monokai",
-                 height = "350px"
+                 height = "225px"
                ),
                
                tags$hr(),
@@ -2120,7 +2451,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "350px"
+                 height = "250px"
                ),
                
                tags$hr(),
@@ -2145,7 +2476,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "380px"
+                 height = "225px"
                )
              )
            }
@@ -3611,7 +3942,7 @@ Partition 7: ████████ 450k
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "140px"
+                 height = "50px"
                ),
                
                tags$hr(),
@@ -3652,7 +3983,7 @@ Partition 7: ████████ 450k
                  ),
                  mode = "sql",
                  theme = "monokai",
-                 height = "1000px"
+                 height = "500px"
                )
                ,
                
@@ -3716,338 +4047,7 @@ Partition 7: ████████ 450k
            
            ,
            
-           
-           # --------------------------------------------------
-           # Broadcast Joins
-           # --------------------------------------------------
-           "Broadcast Joins" = {
-             tagList(
-               
-               h2("📡 Broadcast Joins"),
-               
-               p("Broadcast joins send a small table to every executor, avoiding shuffles of the large table. 
-       This is one of the most powerful performance optimizations in Spark."),
-               
-               h3("Broadcast Join Concepts"),
-               DTOutput("broadcast_table"),
-               
-               tags$hr(),
-               
-               ###############################################
-               # EXAMPLE DATASET (DARK MODE)
-               ###############################################
-               h3("Example Data"),
-               
-               HTML("
-      <div style='background:#222;border:1px solid #444;border-radius:8px;
-                  padding:15px;width:75%;margin:auto;color:#eee;'>
-
-        <b>Large Fact Table (fact_df)</b> — 10 million rows<br><br>
-
-        <table style='border-collapse:collapse;width:100%;margin-bottom:20px;color:#eee;'>
-          <tr style='background:#333;'>
-            <th style='padding:6px;border:1px solid #555;'>id</th>
-            <th style='padding:6px;border:1px solid #555;'>amount</th>
-            <th style='padding:6px;border:1px solid #555;'>country</th>
-          </tr>
-          <tr><td style='padding:6px;border:1px solid #555;'>1</td><td style='padding:6px;border:1px solid #555;'>100</td><td style='padding:6px;border:1px solid #555;'>US</td></tr>
-          <tr><td style='padding:6px;border:1px solid #555;'>2</td><td style='padding:6px;border:1px solid #555;'>250</td><td style='padding:6px;border:1px solid #555;'>UK</td></tr>
-          <tr><td style='padding:6px;border:1px solid #555;'>3</td><td style='padding:6px;border:1px solid #555;'>300</td><td style='padding:6px;border:1px solid #555;'>IN</td></tr>
-        </table>
-
-        <b>Small Dimension Table (dim_df)</b> — 3 rows<br><br>
-
-        <table style='border-collapse:collapse;width:100%;color:#eee;'>
-          <tr style='background:#333;'>
-            <th style='padding:6px;border:1px solid #555;'>id</th>
-            <th style='padding:6px;border:1px solid #555;'>category</th>
-          </tr>
-          <tr><td style='padding:6px;border:1px solid #555;'>1</td><td style='padding:6px;border:1px solid #555;'>A</td></tr>
-          <tr><td style='padding:6px;border:1px solid #555;'>2</td><td style='padding:6px;border:1px solid #555;'>B</td></tr>
-          <tr><td style='padding:6px;border:1px solid #555;'>3</td><td style='padding:6px;border:1px solid #555;'>C</td></tr>
-        </table>
-      </div>
-    "),
-               
-               tags$hr(),
-               
-               ###############################################
-               # SHUFFLE JOIN
-               ###############################################
-               h3("❌ Shuffle Join (No Broadcast)"),
-               
-               p("Without broadcast, Spark must shuffle both tables so matching keys end up in the same partition."),
-               
-               HTML("
-      <div style='background:#2a1f1f;border:1px solid #553333;border-radius:8px;
-                  padding:20px;width:85%;margin:auto;color:#eee;'>
-
-        <b>Before Join:</b><br><br>
-
-        <table style='border-collapse:collapse;width:100%;margin-bottom:10px;color:#eee;'>
-          <tr style='background:#5a2d2d;'>
-            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 0</th>
-            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 1</th>
-          </tr>
-          <tr>
-            <td style='padding:8px;border:1px solid #555;'>id: 1, 3, 7, ...</td>
-            <td style='padding:8px;border:1px solid #555;'>id: 2, 4, 8, ...</td>
-          </tr>
-        </table>
-
-        <table style='border-collapse:collapse;width:100%;color:#eee;'>
-          <tr style='background:#5a2d2d;'>
-            <th style='padding:6px;border:1px solid #555;'>dim_df Partition 0</th>
-            <th style='padding:6px;border:1px solid #555;'>dim_df Partition 1</th>
-          </tr>
-          <tr>
-            <td style='padding:8px;border:1px solid #555;'>id: 1, 2</td>
-            <td style='padding:8px;border:1px solid #555;'>id: 3</td>
-          </tr>
-        </table>
-
-        <p style='margin-top:15px;'><b>After Shuffle:</b></p>
-
-        <pre style='font-size:14px;background:#1a1a1a;color:#eee;border:1px solid #444;padding:10px;border-radius:6px;'>
-fact_df → shuffled
-dim_df → shuffled
-Both tables must be reorganized by key.
-        </pre>
-
-        <p style='font-style:italic;color:#ff7777;margin-top:10px;'>
-          Shuffle join = expensive, slow, and unnecessary when one table is tiny.
-        </p>
-      </div>
-    "),
-               
-               tags$hr(),
-               
-               ###############################################
-               # BROADCAST JOIN
-               ###############################################
-               h3("✅ Broadcast Join (Fast, No Shuffle)"),
-               
-               p("Spark sends the small table to every executor. The large table stays where it is — no shuffle."),
-               
-               HTML("
-      <div style='background:#1e3321;border:1px solid #335533;border-radius:8px;
-                  padding:20px;width:85%;margin:auto;color:#eee;'>
-
-        <b>Broadcasting dim_df to all executors:</b><br><br>
-
-        <pre style='font-size:14px;background:#1a1a1a;color:#eee;border:1px solid #444;padding:10px;border-radius:6px;'>
-Executor 1 receives dim_df (3 rows)
-Executor 2 receives dim_df (3 rows)
-Executor 3 receives dim_df (3 rows)
-...
-        </pre>
-
-        <p style='margin-top:15px;'><b>Join happens locally:</b></p>
-
-        <table style='border-collapse:collapse;width:100%;color:#eee;'>
-          <tr style='background:#2d5533;'>
-            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 0</th>
-            <th style='padding:6px;border:1px solid #555;'>fact_df Partition 1</th>
-          </tr>
-          <tr>
-            <td style='padding:8px;border:1px solid #555;'>
-              id: 1 → join with dim_df<br>
-              id: 3 → join with dim_df
-            </td>
-            <td style='padding:8px;border:1px solid #555;'>
-              id: 2 → join with dim_df<br>
-              id: 4 → join with dim_df
-            </td>
-          </tr>
-        </table>
-
-        <p style='font-style:italic;color:#99ff99;margin-top:10px;'>
-          Broadcast join = no shuffle, fast, ideal for small dimension tables.
-        </p>
-      </div>
-    "),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 1. PYSPARK
-               ###############################################
-               h3("PySpark"),
-               
-               aceEditor(
-                 "code_broadcast",
-                 value = paste(
-                   "from pyspark.sql.functions import broadcast",
-                   "",
-                   "# Broadcast the small dimension table",
-                   "df_joined = fact_df.join(broadcast(dim_df), on='id', how='inner')",
-                   "",
-                   "# Without broadcast (shuffle)",
-                   "df_joined2 = fact_df.join(dim_df, on='id', how='inner')",
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "200px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 2. SPARK SQL
-               ###############################################
-               h3("Spark SQL"),
-               
-               aceEditor(
-                 "spark_sql_broadcast",
-                 value = paste(
-                   'spark.sql("""',
-                   "SELECT /*+ BROADCAST(dim_df) */",
-                   "  f.*, d.category",
-                   "FROM fact_df f",
-                   "JOIN dim_df d",
-                   "ON f.id = d.id",
-                   '""")',
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "200px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 3. SQL (Databricks + Standard SQL)
-               ###############################################
-               h3("SQL"),
-               
-               aceEditor(
-                 "sql_broadcast_combined",
-                 value = paste(
-                   "-- =====================================================",
-                   "-- Databricks / Spark SQL (REAL BROADCAST JOIN)",
-                   "-- =====================================================",
-                   "",
-                   "SELECT /*+ BROADCAST(dim_df) */",
-                   "  f.*, d.category",
-                   "FROM fact_df f",
-                   "JOIN dim_df d",
-                   "ON f.id = d.id;",
-                   "",
-                   "",
-                   "-- =====================================================",
-                   "-- Other SQL Engines with JOIN HINTS",
-                   "-- (Oracle, BigQuery, Snowflake, Presto/Trino, etc.)",
-                   "-- =====================================================",
-                   "",
-                   "-- Oracle-style hint",
-                   "SELECT /*+ USE_NL(d) */",
-                   "  f.*, d.category",
-                   "FROM fact_df f",
-                   "JOIN dim_df d",
-                   "ON f.id = d.id;",
-                   "",
-                   "-- BigQuery hint",
-                   "SELECT f.*, d.category",
-                   "FROM fact_df f",
-                   "JOIN dim_df d",
-                   "ON f.id = d.id",
-                   "OPTIONS (broadcast_join = true);",
-                   "",
-                   "",
-                   "-- =====================================================",
-                   "-- Standard ANSI SQL (NO broadcast join feature)",
-                   "-- Closest equivalent: TEMP TABLE for small dimension",
-                   "-- =====================================================",
-                   "",
-                   "CREATE TEMP TABLE dim_small AS",
-                   "SELECT * FROM dim_df;",
-                   "",
-                   "SELECT f.*, d.category",
-                   "FROM fact_df f",
-                   "JOIN dim_small d",
-                   "ON f.id = d.id;",
-                   "",
-                   "-- This avoids recomputing dim_df, but is NOT a broadcast join.",
-                   sep = "\n"
-                 ),
-                 mode = "sql",
-                 theme = "monokai",
-                 height = "1000px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 4. PANDAS
-               ###############################################
-               h3("Pandas"),
-               
-               aceEditor(
-                 "pandas_broadcast",
-                 value = paste(
-                   "import pandas as pd",
-                   "",
-                   "fact_df = pd.read_csv('fact.csv')",
-                   "dim_df = pd.read_csv('dim.csv')",
-                   "",
-                   "# Pandas automatically keeps small tables in memory",
-                   "# Equivalent to broadcast join because dim_df is tiny",
-                   "",
-                   "df_joined = fact_df.merge(dim_df, on='id', how='inner')",
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "200px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 5. POLARS
-               ###############################################
-               h3("Polars"),
-               
-               aceEditor(
-                 "polars_broadcast",
-                 value = paste(
-                   "import polars as pl",
-                   "",
-                   "fact_df = pl.read_csv('fact.csv')",
-                   "dim_df = pl.read_csv('dim.csv')",
-                   "",
-                   "# Polars automatically keeps small tables in memory",
-                   "# Equivalent to broadcast join behavior",
-                   "",
-                   "df_joined = fact_df.join(dim_df, on='id', how='inner')",
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "200px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # SUMMARY
-               ###############################################
-               h3("Summary"),
-               
-               HTML("
-      <div style='border:1px solid #444;padding:15px;width:80%;border-radius:8px;
-                  background:#222;margin:auto;color:#eee;'>
-        <b>Broadcast Join:</b> Small table sent to all executors → no shuffle<br>
-        <b>Shuffle Join:</b> Both tables shuffled → expensive<br><br>
-
-        <b>Rule of thumb:</b> Broadcast when small table < 500MB<br>
-      </div>
-    ")
-             )
-           }
-           
+ 
            
            
            
