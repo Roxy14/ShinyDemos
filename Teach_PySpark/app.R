@@ -2,6 +2,8 @@ library(shiny)
 library(shinyAce)
 library(DT)
 library(bslib)
+library(plotly)
+
 
 ui <- page_sidebar(
   
@@ -90,7 +92,8 @@ ui <- page_sidebar(
         "Wide vs Narrow Transformations",
         "Caching & Persistence",
         "Spark DAG Visualizer",
-        "Quiz"
+        "Quiz",
+        "Benchmarking"
       )
     ),
     
@@ -4343,6 +4346,51 @@ df4.show()                            # action
            }
            
            
+           ,
+           
+           
+           "Benchmarking" = {
+             tagList(
+               h2("📊 Benchmarking: Pandas vs Polars vs PySpark"),
+               
+               p("This benchmark simulates a QC data‑migration workflow using a 15‑column mock Adverse Events dataset with 10% engineered differences to model large‑scale cross‑system validation"),
+               
+               tags$hr(),
+               
+               h3("🏁 Benchmark Summary"),
+               div(
+                 style = "
+    background:#1e1e1e;
+    border-left:5px solid #5a8fd8;
+    padding:15px;
+    margin-bottom:20px;
+    color:#e0e0e0;
+    box-shadow:0 0 10px rgba(90,143,216,0.4);
+  ",
+                 p("BENCHMARK COMPLETE!", style="font-weight:bold;font-size:18px;"),
+                 p("Collected 8 results across 8 test scales.")
+               )
+               ,
+               
+               h3("📈 Runtime Comparison"),
+               p("Execution times for Pandas, Polars, and PySpark across increasing dataset sizes:"),
+               
+               plotlyOutput("benchmark_plot", height = "500px"),
+               
+               tags$hr(),
+               
+               h3("🔍 Interpretation"),
+               tags$ul(
+                 tags$li("🔹 **Pandas** performs well up to ~1M rows but times out beyond 5M."),
+                 tags$li("🔹 **Polars** is consistently faster than Pandas and handles up to ~5M rows before timing out at 10M."),
+                 tags$li("🔹 **PySpark** has higher overhead for small datasets but scales extremely well, outperforming both Pandas and Polars at large sizes.")
+               ),
+               
+               p("This mirrors real‑world expectations: Pandas is ideal for small to medium data, Polars excels on a single machine with multi‑threading, and PySpark dominates at large scale due to distributed execution.")
+             )
+           }
+           
+           
            
            
            ,
@@ -5085,6 +5133,36 @@ id  category  date         amount
       )
     )
   })
+  
+  output$benchmark_plot <- plotly::renderPlotly({
+    
+    df <- data.frame(
+      num_rows = c(100, 1000, 10000, 100000, 1e6, 2e6, 5e6, 1e7),
+      pandas = c(0.03, 0.02, 0.08, 0.70, 8.15, 18.56, NA, NA),
+      polars = c(0.00, 0.01, 0.05, 0.45, 4.71, 9.79, 29.80, NA),
+      pyspark = c(2.12, 2.25, 1.92, 2.31, 3.56, 5.05, 8.28, 13.91)
+    )
+    
+    plot_ly(df, x = ~num_rows, y = ~pandas, type = "scatter", mode = "lines+markers",
+            name = "Pandas", line = list(color="#4da6ff")) %>%
+      add_trace(y = ~polars, name = "Polars", mode = "lines+markers",
+                line = list(color="#66ff66")) %>%
+      add_trace(y = ~pyspark, name = "PySpark", mode = "lines+markers",
+                line = list(color="#ff6666")) %>%
+      layout(
+        xaxis = list(title = "Number of Rows", type = "category"),
+        yaxis = list(
+          title = "Runtime (seconds)",
+          type = "log",
+          tickformat = ".2f",
+          ticksuffix = "s"
+        ),
+        legend = list(title=list(text="Engine"))
+      )
+    
+  })
+  
+  
   
   output$dag_table <- renderDT({
     datatable(
