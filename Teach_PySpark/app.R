@@ -277,11 +277,6 @@ df.filter(pl.col('age') > 30)",
            
            ,
            
-           
-           
-           
-           
-           
            "Spark Architecture" = {
              tagList(
                h2("🏗 Spark Architecture"),
@@ -291,7 +286,7 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
-               p("Spark is designed for big data, so it spreads work across many machines. The driver plans the work, executors run tasks in parallel, and the cluster manager assigns resources."),
+               p("Spark is designed for big data, so it spreads work across many machines. The driver plans the work, the Spark Engine optimizes and prepares the execution plan, executors run tasks in parallel, and the cluster manager assigns resources."),
                
                p("How this compares to other tools:"),
                tags$ul(
@@ -300,46 +295,65 @@ df.filter(pl.col('age') > 30)",
                  tags$li("🔹 PySpark / Spark SQL — distribute data and computation across many executors.")
                ),
                
-               p("Analogy: Pandas and Polars are like cooking in your own kitchen. Spark is like running a restaurant kitchen — the driver is the head chef, executors are the line cooks, and the cluster manager assigns stations."),
+               p("Analogy: Pandas and Polars are like cooking in your own kitchen. Spark is like running a restaurant kitchen — the driver is the head chef, the Spark Engine is the sous‑chef planning the workflow, executors are the line cooks, and the cluster manager assigns stations."),
                
                tags$hr(),
                
                h3("Architecture Diagram"),
                HTML('
 <div style="width:100%;overflow-x:auto;text-align:center;">
-<svg width="760" height="330" viewBox="0 0 760 330" preserveAspectRatio="xMidYMid meet" style="background:#fafafa;border:1px solid #ccc;border-radius:8px;padding:10px;">
-  
+<svg width="820" height="600" viewBox="0 0 820 600" preserveAspectRatio="xMidYMid meet" style="background:#fafafa;border:1px solid #ccc;border-radius:8px;padding:10px;">
+
   <!-- Driver Program -->
-  <rect x="230" y="20" width="300" height="60" rx="10" ry="10" fill="#d9eaff" stroke="#5a8fd8" stroke-width="2"></rect>
-  <text x="380" y="55" font-size="18" text-anchor="middle" fill="#003366">Driver Program</text>
+  <rect x="260" y="20" width="300" height="80" rx="10" ry="10" fill="#d9eaff" stroke="#5a8fd8" stroke-width="2"></rect>
+  <text x="410" y="50" font-size="18" text-anchor="middle" fill="#003366">Driver Program</text>
+  <text x="410" y="75" font-size="13" text-anchor="middle" fill="#003366">
+    (builds DAG, optimizes plan, schedules tasks)
+  </text>
+
+  <!-- Arrow to Spark Engine -->
+  <line x1="410" y1="100" x2="410" y2="150" stroke="#333" stroke-width="2"></line>
+  <polygon points="405,150 415,150 410,160" fill="#333"></polygon>
+
+  <!-- Spark Engine -->
+  <rect x="200" y="160" width="420" height="100" rx="10" ry="10" fill="#eef7ff" stroke="#5a8fd8" stroke-width="2"></rect>
+  <text x="410" y="190" font-size="20" text-anchor="middle" fill="#003366">Spark Engine</text>
+
+  <!-- Catalyst + Tungsten -->
+  <text x="410" y="220" font-size="15" text-anchor="middle" fill="#003366">
+    Catalyst (Query Optimizer) • Tungsten (Execution Engine)
+  </text>
 
   <!-- Arrow to Cluster Manager -->
-  <line x1="380" y1="80" x2="380" y2="130" stroke="#333" stroke-width="2"></line>
-  <polygon points="375,130 385,130 380,140" fill="#333"></polygon>
+  <line x1="410" y1="260" x2="410" y2="320" stroke="#333" stroke-width="2"></line>
+  <polygon points="405,320 415,320 410,330" fill="#333"></polygon>
 
   <!-- Cluster Manager -->
-  <rect x="180" y="140" width="400" height="60" rx="10" ry="10" fill="#ffeccc" stroke="#d89a3c" stroke-width="2"></rect>
-  <text x="380" y="175" font-size="18" text-anchor="middle" fill="#663300">Cluster Manager</text>
+  <rect x="200" y="330" width="420" height="90" rx="10" ry="10" fill="#ffeccc" stroke="#d89a3c" stroke-width="2"></rect>
+  <text x="410" y="365" font-size="18" text-anchor="middle" fill="#663300">Cluster Manager</text>
+  <text x="410" y="395" font-size="14" text-anchor="middle" fill="#663300">
+    (allocates resources, launches executors, monitors them)
+  </text>
 
   <!-- Arrows to Executors -->
-  <line x1="380" y1="200" x2="200" y2="250" stroke="#333" stroke-width="2"></line>
-  <polygon points="195,250 205,250 200,260" fill="#333"></polygon>
+  <line x1="410" y1="420" x2="230" y2="480" stroke="#333" stroke-width="2"></line>
+  <polygon points="225,480 235,480 230,490" fill="#333"></polygon>
 
-  <line x1="380" y1="200" x2="380" y2="250" stroke="#333" stroke-width="2"></line>
-  <polygon points="375,250 385,250 380,260" fill="#333"></polygon>
+  <line x1="410" y1="420" x2="410" y2="480" stroke="#333" stroke-width="2"></line>
+  <polygon points="405,480 415,480 410,490" fill="#333"></polygon>
 
-  <line x1="380" y1="200" x2="560" y2="250" stroke="#333" stroke-width="2"></line>
-  <polygon points="555,250 565,250 560,260" fill="#333"></polygon>
+  <line x1="410" y1="420" x2="590" y2="480" stroke="#333" stroke-width="2"></line>
+  <polygon points="585,480 595,480 590,490" fill="#333"></polygon>
 
   <!-- Executors -->
-  <rect x="120" y="260" width="160" height="60" rx="10" ry="10" fill="#e8ffe8" stroke="#4caf50" stroke-width="2"></rect>
-  <text x="200" y="295" font-size="16" text-anchor="middle" fill="#1b5e20">Executor 1</text>
+  <rect x="150" y="490" width="160" height="60" rx="10" ry="10" fill="#e8ffe8" stroke="#4caf50" stroke-width="2"></rect>
+  <text x="230" y="525" font-size="16" text-anchor="middle" fill="#1b5e20">Executor 1</text>
 
-  <rect x="300" y="260" width="160" height="60" rx="10" ry="10" fill="#e8ffe8" stroke="#4caf50" stroke-width="2"></rect>
-  <text x="380" y="295" font-size="16" text-anchor="middle" fill="#1b5e20">Executor 2</text>
+  <rect x="330" y="490" width="160" height="60" rx="10" ry="10" fill="#e8ffe8" stroke="#4caf50" stroke-width="2"></rect>
+  <text x="410" y="525" font-size="16" text-anchor="middle" fill="#1b5e20">Executor 2</text>
 
-  <rect x="480" y="260" width="160" height="60" rx="10" ry="10" fill="#e8ffe8" stroke="#4caf50" stroke-width="2"></rect>
-  <text x="560" y="295" font-size="16" text-anchor="middle" fill="#1b5e20">Executor N</text>
+  <rect x="510" y="490" width="160" height="60" rx="10" ry="10" fill="#e8ffe8" stroke="#4caf50" stroke-width="2"></rect>
+  <text x="590" y="525" font-size="16" text-anchor="middle" fill="#1b5e20">Executor N</text>
 
 </svg>
 </div>
@@ -347,8 +361,18 @@ df.filter(pl.col('age') > 30)",
                
                tags$hr(),
                
+               h3("Inside the Spark Engine"),
+               p("Two major subsystems power Spark’s performance:"),
+               tags$ul(
+                 tags$li("⚙️ **Catalyst** — Spark’s query optimizer that rewrites your transformations into an efficient execution plan."),
+                 tags$li("⚡ **Tungsten** — Spark’s high‑performance execution engine that manages memory efficiently and generates optimized bytecode for executors.")
+               ),
+               
+               tags$hr(),
+               
                h3("Why This Matters"),
-               p("Spark can scale far beyond what Pandas or Polars can handle because it runs work across many executors instead of a single machine.")
+               p("Spark can scale far beyond what Pandas or Polars can handle because it runs work across many executors instead of a single machine."),
+               p("Spark’s performance comes not just from parallelism, but from Catalyst (its optimizer) and Tungsten (its execution engine), which together ensure your code runs efficiently across the cluster.")
              )
            }
            
@@ -1508,7 +1532,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "230px"
+                 height = "250px"
                ),
                # -------------------------
                # Spark SQL (full query with spark.sql)
@@ -1535,7 +1559,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "260px"
+                 height = "280px"
                ),
                
                # -------------------------
@@ -1589,7 +1613,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "260px"
+                 height = "280px"
                ),
                
                # -------------------------
@@ -2582,7 +2606,7 @@ ORDER BY amount ASC
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "330px"
+                 height = "350px"
                ),
                
                tags$hr(),
