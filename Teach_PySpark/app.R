@@ -2760,6 +2760,9 @@ ORDER BY amount ASC
        and finally into a physical plan. Catalyst applies rule‑based and cost‑based optimizations such as 
        predicate pushdown, constant folding, projection pruning, and join reordering."),
                
+               p("One important thing to know: Catalyst works the same way whether you use the PySpark DataFrame API or Spark SQL. 
+       Both APIs generate a logical plan, and Catalyst optimizes it before execution. Different syntax, same engine."),
+               
                h3("Catalyst Optimization Techniques"),
                DTOutput("catalyst_table"),
                
@@ -2783,7 +2786,8 @@ ORDER BY amount ASC
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark (Shows Catalyst in Action)"),
+               h3("PySpark (DataFrame API)"),
+               p("PySpark expressions are converted into a logical plan. Catalyst optimizes that plan before execution."),
                aceEditor(
                  "code_catalyst",
                  value = paste(
@@ -2807,6 +2811,7 @@ ORDER BY amount ASC
                # 2. SPARK SQL
                ###############################################
                h3("Spark SQL"),
+               p("Spark SQL queries also go through Catalyst. SQL and the DataFrame API share the same optimizer and execution engine."),
                aceEditor(
                  "spark_sql_catalyst",
                  value = paste(
@@ -2820,70 +2825,6 @@ ORDER BY amount ASC
                  mode = "python",
                  theme = "monokai",
                  height = "200px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 3. STANDARD SQL (Non‑Spark SQL)
-               ###############################################
-               h3("SQL"),
-               p("How the same logic looks in ordinary SQL, without Spark’s optimizer."),
-               aceEditor(
-                 "sql_standard_catalyst",
-                 value = paste(
-                   "SELECT name",
-                   "FROM people",
-                   "WHERE age > 30;",
-                   sep = "\n"
-                 ),
-                 mode = "sql",
-                 theme = "monokai",
-                 height = "140px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 4. PANDAS
-               ###############################################
-               h3("Pandas"),
-               aceEditor(
-                 "pandas_catalyst",
-                 value = paste(
-                   "import pandas as pd",
-                   "",
-                   "df = pd.read_parquet('people.parquet')",
-                   "",
-                   "# Pandas: filter + select",
-                   "df_filtered = df[df['age'] > 30][['name']]",
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "180px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 5. POLARS
-               ###############################################
-               h3("Polars"),
-               aceEditor(
-                 "polars_catalyst",
-                 value = paste(
-                   "import polars as pl",
-                   "",
-                   "df = pl.read_parquet('people.parquet')",
-                   "",
-                   "# Polars: filter + select",
-                   "df_filtered = df.filter(pl.col('age') > 30).select('name')",
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "180px"
                ),
                
                tags$hr(),
@@ -2926,8 +2867,11 @@ Project [name#12]
                h2("⚡ Tungsten Engine"),
                
                p("Tungsten is Spark’s physical execution engine. It focuses on CPU and memory efficiency through 
-       off‑heap memory, binary row format, and whole‑stage code generation. Tungsten is always active — 
-       you do not enable it manually."),
+       off‑heap memory, a compact binary row format, and whole‑stage code generation. Tungsten is always active — 
+       you don’t enable it manually; Spark uses it automatically whenever it executes a physical plan."),
+               
+               p("Just like Catalyst, Tungsten powers both the PySpark DataFrame API and Spark SQL. 
+       No matter which API you use, Spark ultimately generates a physical plan that Tungsten executes."),
                
                h3("Tungsten Optimization Techniques"),
                DTOutput("tungsten_table"),
@@ -2958,7 +2902,8 @@ Project [name#12]
                ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark (Shows Tungsten Physical Plan)"),
+               h3("PySpark (DataFrame API)"),
+               p("PySpark expressions compile into a physical plan that Tungsten executes using whole‑stage code generation."),
                aceEditor(
                  "code_tungsten",
                  value = paste(
@@ -2982,6 +2927,7 @@ Project [name#12]
                # 2. SPARK SQL
                ###############################################
                h3("Spark SQL"),
+               p("Spark SQL queries also compile into the same physical plan format. Tungsten executes SQL and DataFrame operations identically."),
                aceEditor(
                  "spark_sql_tungsten",
                  value = paste(
@@ -2994,69 +2940,6 @@ Project [name#12]
                  mode = "python",
                  theme = "monokai",
                  height = "180px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 3. STANDARD SQL
-               ###############################################
-               h3("SQL"),
-               p("How the same logic looks in ordinary SQL, without Spark’s execution engine."),
-               aceEditor(
-                 "sql_standard_tungsten",
-                 value = paste(
-                   "SELECT name, age",
-                   "FROM people;",
-                   sep = "\n"
-                 ),
-                 mode = "sql",
-                 theme = "monokai",
-                 height = "120px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 4. PANDAS
-               ###############################################
-               h3("Pandas"),
-               aceEditor(
-                 "pandas_tungsten",
-                 value = paste(
-                   "import pandas as pd",
-                   "",
-                   "df = pd.read_parquet('people.parquet')",
-                   "",
-                   "# Pandas: select columns",
-                   "df_selected = df[['name', 'age']]",
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "160px"
-               ),
-               
-               tags$hr(),
-               
-               ###############################################
-               # 5. POLARS
-               ###############################################
-               h3("Polars"),
-               aceEditor(
-                 "polars_tungsten",
-                 value = paste(
-                   "import polars as pl",
-                   "",
-                   "df = pl.read_parquet('people.parquet')",
-                   "",
-                   "# Polars: select columns",
-                   "df_selected = df.select(['name', 'age'])",
-                   sep = "\n"
-                 ),
-                 mode = "python",
-                 theme = "monokai",
-                 height = "160px"
                ),
                
                tags$hr(),
@@ -3104,6 +2987,10 @@ Project [name#12, age#10]
                p("Partitioning determines how Spark distributes data across the cluster. 
        Shuffling occurs when Spark must move data between partitions — usually during joins, aggregations, 
        or repartitioning. Understanding how data moves is essential for performance."),
+               
+               p("Only the PySpark and Spark SQL examples below run on Spark and can trigger a shuffle.
+The SQL, Pandas, and Polars examples are just syntax comparisons — they don’t shuffle."),
+               
                
                h3("Partitioning Concepts"),
                DTOutput("partition_table"),
@@ -3378,6 +3265,10 @@ Project [name#12, age#10]
        balance workloads, and prepare data for joins or aggregations. 
        This section focuses on *why* repartitioning matters and how to handle skew."),
                
+               p("Only the PySpark and Spark SQL examples below run on Spark and can trigger a shuffle.
+The SQL, Pandas, and Polars examples are just syntax comparisons — they don’t shuffle."),
+               
+               
                h3("Repartitioning Concepts"),
                DTOutput("repartition_table"),
                
@@ -3526,7 +3417,7 @@ Partition 7: ████████ 450k
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "260px"
+                 height = "300px"
                ),
                
                tags$hr(),
@@ -3789,9 +3680,17 @@ Partition 7: ████████ 450k
                tags$hr(),
                
                ###############################################
+               # IMPORTANT NOTE ABOUT SHUFFLE
+               ###############################################
+               p("Only the PySpark and Spark SQL examples below run on Spark and show narrow vs wide (shuffle) behavior. 
+       The SQL, Pandas, and Polars examples are just syntax comparisons — they don’t shuffle."),
+               
+               tags$hr(),
+               
+               ###############################################
                # 1. PYSPARK
                ###############################################
-               h3("PySpark"),
+               h3("PySpark — shows narrow vs wide behavior"),
                aceEditor(
                  "code_wide_narrow",
                  value = paste(
@@ -3810,21 +3709,28 @@ Partition 7: ████████ 450k
                
                tags$hr(),
                
+    
                ###############################################
                # 2. SPARK SQL
                ###############################################
-               h3("Spark SQL"),
+               ###############################################
+               # 2. SPARK SQL
+               ###############################################
+               h3("Spark SQL — shows narrow vs wide behavior"),
                aceEditor(
                  "spark_sql_wide_narrow",
                  value = paste(
+                   "# Narrow (no shuffle)",
                    'spark.sql("""',
                    "SELECT name, age FROM table",
                    '""")',
                    "",
+                   "# Narrow (no shuffle)",
                    'spark.sql("""',
                    "SELECT * FROM table WHERE age > 30",
                    '""")',
                    "",
+                   "# Wide (shuffle)",
                    'spark.sql("""',
                    "SELECT country, COUNT(*) FROM table GROUP BY country",
                    '""")',
@@ -3832,15 +3738,16 @@ Partition 7: ████████ 450k
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "220px"
+                 height = "250px"
                ),
+               
                
                tags$hr(),
                
                ###############################################
                # 3. STANDARD SQL
                ###############################################
-               h3("SQL"),
+               h3("SQL — comparison only (no shuffle)"),
                aceEditor(
                  "sql_standard_wide_narrow",
                  value = paste(
@@ -3848,7 +3755,7 @@ Partition 7: ████████ 450k
                    "SELECT name, age FROM table;",
                    "SELECT * FROM table WHERE age > 30;",
                    "",
-                   "-- Wide (shuffle)",
+                   "-- Wide (logical only, no Spark shuffle)",
                    "SELECT country, COUNT(*) FROM table GROUP BY country;",
                    sep = "\n"
                  ),
@@ -3862,7 +3769,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 4. PANDAS
                ###############################################
-               h3("Pandas"),
+               h3("Pandas — comparison only (no shuffle)"),
                aceEditor(
                  "pandas_wide_narrow",
                  value = paste(
@@ -3874,7 +3781,7 @@ Partition 7: ████████ 450k
                    "df2 = df[['name', 'age']]",
                    "df3 = df[df['age'] > 30]",
                    "",
-                   "# Wide",
+                   "# Wide (logical only, no Spark shuffle)",
                    "df4 = df.groupby('country').size()",
                    sep = "\n"
                  ),
@@ -3888,7 +3795,7 @@ Partition 7: ████████ 450k
                ###############################################
                # 5. POLARS
                ###############################################
-               h3("Polars"),
+               h3("Polars — comparison only (no shuffle)"),
                aceEditor(
                  "polars_wide_narrow",
                  value = paste(
@@ -3900,7 +3807,7 @@ Partition 7: ████████ 450k
                    "df2 = df.select(['name', 'age'])",
                    "df3 = df.filter(pl.col('age') > 30)",
                    "",
-                   "# Wide",
+                   "# Wide (logical only, no Spark shuffle)",
                    "df4 = df.groupby('country').count()",
                    sep = "\n"
                  ),
@@ -3910,10 +3817,6 @@ Partition 7: ████████ 450k
                )
              )
            }
-           
-           
-           
-           
            
            
            ,
@@ -4076,7 +3979,7 @@ Partition 7: ████████ 450k
            
            ,
            
- 
+           
            
            
            
@@ -4264,7 +4167,7 @@ df4.show()                            # action
                  ),
                  mode = "sql",
                  theme = "monokai",
-                 height = "1000px",
+                 height = "500px",
                  wordWrap = TRUE
                ),
                
@@ -4291,7 +4194,7 @@ df4.show()                            # action
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "400px"
+                 height = "300px"
                ),
                
                tags$hr(),
@@ -4324,7 +4227,7 @@ df4.show()                            # action
                  ),
                  mode = "python",
                  theme = "monokai",
-                 height = "400px"
+                 height = "350px"
                ),
                
                tags$hr(),
