@@ -178,6 +178,8 @@ server <- function(input, output, session) {
                
                h3("🔥 What is Apache Spark?"),
                p("Spark helps you work with big datasets by spreading work across many machines. It's fast, scalable, and friendly to both Python and SQL users."),
+               p("Spark gives you two ways to work with data at scale: a Python-friendly DataFrame API (PySpark) and a SQL engine (Spark SQL). 
+Both run on the same underlying execution engine, so you can choose the style that fits your workflow."),
                
                
                # -------------------------
