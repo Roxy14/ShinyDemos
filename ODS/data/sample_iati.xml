@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<iati-activities version="2.03">
+
+  <iati-activity>
+    <iati-identifier>GB-GOV-1-ACT-001</iati-identifier>
+    <reporting-org ref="GB-GOV-1">UK Government</reporting-org>
+    <title><narrative>Health System Strengthening in Kenya</narrative></title>
+    <recipient-country code="KE">Kenya</recipient-country>
+    <sector code="12220">Basic Health Care</sector>
+
+    <transaction>
+      <transaction-type code="C"/>
+      <value currency="USD" value-date="2023-01-15">2000000</value>
+      <transaction-date iso-date="2023-01-15"/>
+    </transaction>
+
+    <transaction>
+      <transaction-type code="D"/>
+      <value currency="USD" value-date="2023-06-10">750000</value>
+      <transaction-date iso-date="2023-06-10"/>
+    </transaction>
+  </iati-activity>
+
+  <iati-activity>
+    <iati-identifier>GB-GOV-1-ACT-002</iati-identifier>
+    <reporting-org ref="GB-GOV-1">UK Government</reporting-org>
+    <title><narrative>Maternal Health Support in Uganda</narrative></title>
+    <recipient-country code="UG">Uganda</recipient-country>
+    <sector code="12230">Basic Health Infrastructure</sector>
+
+    <transaction>
+      <transaction-type code="C"/>
+      <value currency="USD" value-date="2022-11-01">1500000</value>
+      <transaction-date iso-date="2022-11-01"/>
+    </transaction>
+
+    <transaction>
+      <transaction-type code="D"/>
+      <value currency="USD" value-date="2023-03-20">500000</value>
+      <transaction-date iso-date="2023-03-20"/>
+    </transaction>
+  </iati-activity>
+
+  <iati-activity>
+    <iati-identifier>UNICEF-ACT-101</iati-identifier>
+    <reporting-org ref="XM-DAC-41122">UNICEF</reporting-org>
+    <title><narrative>Child Nutrition Programme in Kenya</narrative></title>
+    <recipient-country code="KE">Kenya</recipient-country>
+    <sector code="12240">Basic Nutrition</sector>
+
+    <transaction>
+      <transaction-type code="C"/>
+      <value currency="USD" value-date="2022-09-10">800000</value>
+      <transaction-date iso-date="2022-09-10"/>
+    </transaction>
+
+    <transaction>
+      <transaction-type code="D"/>
+      <value currency="USD" value-date="2023-02-05">300000</value>
+      <transaction-date iso-date="2023-02-05"/>
+    </transaction>
+  </iati-activity>
+
+  <iati-activity>
+    <iati-identifier>UNICEF-ACT-102</iati-identifier>
+    <reporting-org ref="XM-DAC-41122">UNICEF</reporting-org>
+    <title><narrative>Early Childhood Education in Uganda</narrative></title>
+    <recipient-country code="UG">Uganda</recipient-country>
+    <sector code="11130">Pre-primary Education</sector>
+
+    <transaction>
+      <transaction-type code="C"/>
+      <value currency="USD" value-date="2022-08-01">600000</value>
+      <transaction-date iso-date="2022-08-01"/>
+    </transaction>
+
+    <transaction>
+      <transaction-type code="D"/>
+      <value currency="USD" value-date="2023-01-15">250000</value>
+      <transaction-date iso-date="2023-01-15"/>
+    </transaction>
+  </iati-activity>
+
+  <iati-activity>
+    <iati-identifier>WB-ACT-501</iati-identifier>
+    <reporting-org ref="44000">World Bank</reporting-org>
+    <title><narrative>Road Infrastructure Upgrade in Kenya</narrative></title>
+    <recipient-country code="KE">Kenya</recipient-country>
+    <sector code="21020">Road Transport</sector>
+
+    <transaction>
+      <transaction-type code="C"/>
+      <value currency="USD" value-date="2021-12-01">5000000</value>
+      <transaction-date iso-date="2021-12-01"/>
+    </transaction>
+
+    <transaction>
+      <transaction-type code="D"/>
+      <value currency="USD" value-date="2023-04-01">1200000</value>
+      <transaction-date iso-date="2023-04-01"/>
+    </transaction>
+  </iati-activity>
+
+  <iati-activity>
+    <iati-identifier>WB-ACT-502</iati-identifier>
+    <reporting-org ref="44000">World Bank</reporting-org>
+    <title><narrative>Energy Grid Expansion in Tanzania</narrative></title>
+    <recipient-country code="TZ">Tanzania</recipient-country>
+    <sector code="23010">Energy Generation</sector>
+
+    <transaction>
+      <transaction-type code="C"/>
+      <value currency="USD" value-date="2022-03-01">4000000</value>
+      <transaction-date iso-date="2022-03-01"/>
+    </transaction>
+
+    <transaction>
+      <transaction-type code="D"/>
+      <value currency="USD" value-date="2023-05-10">900000</value>
+      <transaction-date iso-date="2023-05-10"/>
+    </transaction>
+  </iati-activity>
+
+  <iati-activity>
+    <iati-identifier>WB-ACT-503</iati-identifier>
+    <reporting-org ref="44000">World Bank</reporting-org>
+    <title><narrative>Agricultural Productivity in Rwanda</narrative></title>
+    <recipient-country code="RW">Rwanda</recipient-country>
+    <sector code="31120">Agricultural Development</sector>
+
+    <transaction>
+      <transaction-type code="C"/>
+      <value currency="USD" value-date="2022-01-20">2500000</value>
+      <transaction-date iso-date="2022-01-20"/>
+    </transaction>
+
+    <transaction>
+      <transaction-type code="D"/>
+      <value currency="USD" value-date="2023-03-30">700000</value>
+      <transaction-date iso-date="2023-03-30"/>
+    </transaction>
+  </iati-activity>
+
+</iati-activities>
