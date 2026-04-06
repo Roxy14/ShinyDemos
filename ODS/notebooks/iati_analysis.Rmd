@@ -119,10 +119,10 @@ pre, code {
 This notebook has been created as part of my application to **Open Data Services (ODS)**.  
 Its purpose is to demonstrate:
 
-- my ability to design and structure a clear, reproducible analytical workflow  
-- my understanding of notebook‑based analysis as a transparent communication tool  
-- my approach to validation, documentation, and open‑data‑aligned practices  
-- my ability to collaborate with tools (including AI) while maintaining full analytical oversight  
+- ability to design and structure a clear, reproducible analytical workflow  
+- understanding of notebook‑based analysis as a transparent communication tool  
+- approach to validation, documentation, and open‑data‑aligned practices  
+- ability to collaborate with tools (including AI) while maintaining full analytical oversight  
 
 <div class="authorship-note">
 This notebook was developed through a collaborative workflow combining human expertise and AI‑assisted drafting.  
