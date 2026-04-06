@@ -27,9 +27,7 @@ library(purrr)
 
 <style>
 
-/* ----------------------------- */
-/* PROFESSIONAL, BALANCED LAYOUT */
-/* ----------------------------- */
+/* Professional, balanced layout */
 
 body {
   font-size: 15px;
@@ -44,7 +42,6 @@ body {
   padding: 20px 40px;
 }
 
-/* Headings: clean, consistent, not oversized */
 h1 {
   font-size: 28px;
   margin-top: 35px;
@@ -64,22 +61,30 @@ h3 {
   font-weight: 600;
 }
 
-/* Paragraph spacing */
 p {
   margin: 8px 0 12px 0;
 }
 
-/* Tables */
 table {
   font-size: 14px;
 }
 
-/* Code blocks */
 pre, code {
   font-size: 13px;
 }
 
+/* Authorship note */
+
+.authorship-note {
+  font-size: 13px !important;
+  font-style: italic !important;
+  color: #555 !important;
+  line-height: 1.4;
+  margin: 10px 0 20px 0;
+}
+
 /* Expandable code sections */
+
 .ods-details > summary {
   cursor: pointer;
   font-weight: 600;
@@ -90,6 +95,7 @@ pre, code {
 }
 
 /* Hover tooltip with icon */
+
 .hover-term {
   border-bottom: 1px dotted #1a73e8;
   cursor: help;
@@ -106,16 +112,6 @@ pre, code {
   color: #1a73e8;
 }
 
-.authorship-note {
-  font-size: 14px !important;
-  font-style: italic !important;
-  color: #555 !important;
-  line-height: 1.4;
-  margin: 10px 0 20px 0;
-}
-
-
-
 </style>
 
 # Purpose of This Notebook
@@ -123,18 +119,16 @@ pre, code {
 This notebook has been created as part of my application to **Open Data Services (ODS)**.  
 Its purpose is to demonstrate:
 
-- ability to design and structure a clear, reproducible analytical workflow  
-- understanding of notebook‑based analysis as a transparent communication tool  
-- approach to validation, documentation, and open‑data‑aligned practices  
-- ability to collaborate with tools (including AI) while maintaining full analytical oversight  
+- my ability to design and structure a clear, reproducible analytical workflow  
+- my understanding of notebook‑based analysis as a transparent communication tool  
+- my approach to validation, documentation, and open‑data‑aligned practices  
+- my ability to collaborate with tools (including AI) while maintaining full analytical oversight  
 
-> **Authorship note:**  
 <div class="authorship-note">
 This notebook was developed through a collaborative workflow combining human expertise and AI‑assisted drafting.  
-All analytical decisions, validation, and final editorial judgement were carried out by **Gillian Paterson**.  
+All analytical decisions, validation, and final editorial judgement were carried out by <strong>Gillian Paterson</strong>.  
 AI assistance supported idea generation, code structuring, and iterative refinement.
 </div>
-
 
 ---
 
@@ -145,7 +139,6 @@ This notebook provides a **pseudo‑analysis** of synthetic
       title="The International Aid Transparency Initiative (IATI) is a global open‑data standard for publishing information about development and humanitarian activities. It provides a structured, machine‑readable way for organisations to share data on funding, projects, locations, and results.">
 <span class="hover-icon">ℹ️</span>IATI
 </span> data, designed to demonstrate an ODS‑style approach to clear, transparent, and reproducible analytical workflows.
-
 
 > **Note:** This report uses *synthetic* IATI data for demonstration purposes only.
 
