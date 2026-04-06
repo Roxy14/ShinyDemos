@@ -4286,10 +4286,14 @@ df4.show()                            # action
                
                h3("🔍 Interpretation"),
                tags$ul(
-                 tags$li("🔹 **Pandas** performs well up to ~1M rows but times out beyond 5M."),
-                 tags$li("🔹 **Polars** is consistently faster than Pandas and handles up to ~5M rows before timing out at 10M."),
-                 tags$li("🔹 **PySpark** has higher overhead for small datasets but scales extremely well, outperforming both Pandas and Polars at large sizes.")
-               ),
+                 tags$li(HTML("🔹 <b>Pandas</b> performs well up to ~1M rows but times out beyond 5M.")),
+                 tags$li(HTML("🔹 <b>Polars</b> is consistently faster than Pandas and handles up to ~5M rows before timing out at 10M.")),
+                 tags$li(HTML("🔹 <b>PySpark</b> has higher overhead for small datasets but scales extremely well, outperforming both Pandas and Polars at large sizes.")),
+                 tags$li("🔹 Results are reported in number of rows rather than file size because each engine stores the same data in very different internal formats, producing different memory footprints for identical datasets.")
+               )
+               
+               
+               ,
                
                p("This mirrors real‑world expectations: Pandas is ideal for small to medium data, Polars excels on a single machine with multi‑threading, and PySpark dominates at large scale due to distributed execution.")
              )
