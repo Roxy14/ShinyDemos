@@ -1,0 +1,340 @@
+---
+title: "IATI Data Analysis Demonstration Notebook"
+output:
+  html_document:
+    theme: readable
+    toc: true
+    toc_depth: 3
+params:
+  iati_file: "data/sample_iati.xml"
+  group_by: "recipient-country"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+
+library(xml2)
+library(dplyr)
+library(ggplot2)
+library(tibble)
+library(stringr)
+library(purrr)
+```
+
+<style>
+
+/* ----------------------------- */
+/* PROFESSIONAL, BALANCED LAYOUT */
+/* ----------------------------- */
+
+body {
+  font-size: 15px;
+  line-height: 1.45;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: #222;
+}
+
+.main-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px 40px;
+}
+
+/* Headings: clean, consistent, not oversized */
+h1 {
+  font-size: 28px;
+  margin-top: 35px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+h2 {
+  font-size: 22px;
+  margin-top: 28px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+h3 {
+  font-size: 18px;
+  margin-top: 22px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* Paragraph spacing */
+p {
+  margin: 8px 0 12px 0;
+}
+
+/* Tables */
+table {
+  font-size: 14px;
+}
+
+/* Code blocks */
+pre, code {
+  font-size: 13px;
+}
+
+/* Expandable code sections */
+.ods-details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.ods-details {
+  margin-bottom: 18px;
+}
+
+/* Hover tooltip with icon */
+.hover-term {
+  border-bottom: 1px dotted #1a73e8;
+  cursor: help;
+  color: #1a73e8;
+  font-weight: 600;
+  padding: 0 2px;
+}
+.hover-term:hover {
+  background-color: #eef5ff;
+}
+.hover-icon {
+  font-weight: bold;
+  margin-right: 3px;
+  color: #1a73e8;
+}
+
+.authorship-note {
+  font-size: 14px !important;
+  font-style: italic !important;
+  color: #555 !important;
+  line-height: 1.4;
+  margin: 10px 0 20px 0;
+}
+
+
+
+</style>
+
+# Purpose of This Notebook
+
+This notebook has been created as part of my application to **Open Data Services (ODS)**.  
+Its purpose is to demonstrate:
+
+- ability to design and structure a clear, reproducible analytical workflow  
+- understanding of notebook‑based analysis as a transparent communication tool  
+- approach to validation, documentation, and open‑data‑aligned practices  
+- ability to collaborate with tools (including AI) while maintaining full analytical oversight  
+
+> **Authorship note:**  
+<div class="authorship-note">
+This notebook was developed through a collaborative workflow combining human expertise and AI‑assisted drafting.  
+All analytical decisions, validation, and final editorial judgement were carried out by **Gillian Paterson**.  
+AI assistance supported idea generation, code structuring, and iterative refinement.
+</div>
+
+
+---
+
+# Overview
+
+This notebook provides a **pseudo‑analysis** of synthetic 
+<span class="hover-term" 
+      title="The International Aid Transparency Initiative (IATI) is a global open‑data standard for publishing information about development and humanitarian activities. It provides a structured, machine‑readable way for organisations to share data on funding, projects, locations, and results.">
+<span class="hover-icon">ℹ️</span>IATI
+</span> data, designed to demonstrate an ODS‑style approach to clear, transparent, and reproducible analytical workflows.
+
+
+> **Note:** This report uses *synthetic* IATI data for demonstration purposes only.
+
+---
+
+# 1. Load and Parse IATI XML
+
+<details class="ods-details">
+<summary><strong>Show code</strong></summary>
+
+```{r, echo=TRUE}
+doc <- read_xml(params$iati_file)
+
+activities <- xml_find_all(doc, ".//iati-activity")
+
+get_text <- function(node, xpath) {
+  x <- xml_find_first(node, xpath)
+  if (is.na(x)) NA_character_ else xml_text(x)
+}
+
+df_activities <- tibble(
+  activity_id        = sapply(activities, get_text, ".//iati-identifier"),
+  reporting_org      = sapply(activities, get_text, ".//reporting-org"),
+  recipient_country  = sapply(activities, get_text, ".//recipient-country/@code"),
+  sector             = sapply(activities, get_text, ".//sector/@code"),
+  title              = sapply(activities, get_text, ".//title/narrative")
+) |> distinct()
+```
+
+</details>
+
+### Extracted activities
+
+```{r}
+df_activities
+```
+
+---
+
+# 2. Transactions
+
+<details class="ods-details">
+<summary><strong>Show code</strong></summary>
+
+```{r, echo=TRUE}
+extract_transactions <- function(act_node) {
+  act_id <- get_text(act_node, ".//iati-identifier")
+  txs <- xml_find_all(act_node, ".//transaction")
+  if (length(txs) == 0) return(NULL)
+  
+  tibble(
+    activity_id = act_id,
+    tx_type     = sapply(txs, get_text, ".//transaction-type/@code"),
+    tx_value    = as.numeric(sapply(txs, get_text, ".//value")),
+    tx_currency = sapply(txs, get_text, ".//value/@currency"),
+    tx_date     = sapply(txs, get_text, ".//transaction-date/@iso-date")
+  )
+}
+
+df_tx <- map_dfr(activities, extract_transactions)
+```
+
+</details>
+
+### Extracted transactions
+
+```{r}
+df_tx
+```
+
+---
+
+# 3. Validation Checks
+
+<details class="ods-details">
+<summary><strong>Show code</strong></summary>
+
+```{r, echo=TRUE}
+valid_countries <- c("KE", "UG", "RW", "TZ")
+
+validation_summary <- tibble(
+  check = c(
+    "Missing activity_id",
+    "Missing reporting_org",
+    "Missing recipient_country",
+    "Missing sector",
+    "Missing title",
+    "Duplicate activity_id",
+    "Invalid recipient_country code",
+    "Activities with no transactions"
+  ),
+  count = c(
+    sum(is.na(df_activities$activity_id) | df_activities$activity_id == ""),
+    sum(is.na(df_activities$reporting_org) | df_activities$reporting_org == ""),
+    sum(is.na(df_activities$recipient_country) | df_activities$recipient_country == ""),
+    sum(is.na(df_activities$sector) | df_activities$sector == ""),
+    sum(is.na(df_activities$title) | df_activities$title == ""),
+    sum(duplicated(df_activities$activity_id)),
+    sum(!df_activities$recipient_country %in% valid_countries),
+    sum(!df_activities$activity_id %in% df_tx$activity_id)
+  )
+)
+```
+
+</details>
+
+### Validation summary
+
+```{r}
+validation_summary
+```
+
+---
+
+# 4. Grouped Activity Summary
+
+Grouping by:
+
+**`r params$group_by`**
+
+<details class="ods-details">
+<summary><strong>Show code</strong></summary>
+
+```{r, echo=TRUE}
+group_var <- params$group_by
+group_var_clean <- gsub("-", "_", group_var)
+
+grouped_activities <- df_activities |>
+  group_by(.data[[group_var_clean]]) |>
+  summarise(
+    n_activities = n(),
+    .groups = "drop"
+  ) |>
+  arrange(desc(n_activities))
+```
+
+</details>
+
+### Summary table
+
+```{r}
+grouped_activities
+```
+
+---
+
+# 5. Charts
+
+## Activities by group
+
+```{r}
+ggplot(grouped_activities, aes(
+  x = reorder(.data[[group_var_clean]], n_activities),
+  y = n_activities
+)) +
+  geom_col(fill = "#005ea5") +
+  coord_flip() +
+  theme_minimal() +
+  labs(
+    x = params$group_by,
+    y = "Number of activities",
+    title = paste("Activities grouped by", params$group_by)
+  )
+```
+
+## Total transaction value by country
+
+```{r}
+df_tx_joined <- df_tx |>
+  left_join(df_activities, by = "activity_id")
+
+tx_by_country <- df_tx_joined |>
+  group_by(recipient_country) |>
+  summarise(
+    total_value = sum(tx_value, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(tx_by_country, aes(
+  x = reorder(recipient_country, total_value),
+  y = total_value
+)) +
+  geom_col(fill = "#28a197") +
+  coord_flip() +
+  theme_minimal() +
+  labs(
+    x = "Country",
+    y = "Total value",
+    title = "Total transaction value by country"
+  )
+```
+
