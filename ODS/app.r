@@ -1,45 +1,44 @@
 library(shiny)
 library(rmarkdown)
 
-# ---- 1. Render the Rmd once, before the app starts ----
-
-project_root <- getwd()
-
-rmd_path  <- file.path(project_root, "notebooks", "iati_analysis.Rmd")
-xml_path  <- file.path(project_root, "data", "sample_iati.xml")
-
-# Output goes to a temp file
-out_file  <- tempfile(pattern = "iati_report_", fileext = ".html")
-out_dir   <- dirname(out_file)
-
-rmarkdown::render(
-  input         = rmd_path,
-  params        = list(
-    iati_file = xml_path,
-    group_by  = "recipient-country"
-  ),
-  output_file   = basename(out_file),
-  output_dir    = out_dir,
-  quiet         = FALSE,
-  knit_root_dir = project_root
-)
-
-report_path <- file.path(out_dir, basename(out_file))
-
-# ---- 2. Minimal UI: just show the report ----
-
 ui <- fluidPage(
-  titlePanel("IATI Analysis Report"),
-  htmlOutput("report")
+  titlePanel("IATI Data Analysis Demonstration"),
+  uiOutput("report_frame")
 )
 
 server <- function(input, output, session) {
-  output$report <- renderUI({
-    if (file.exists(report_path)) {
-      includeHTML(report_path)
-    } else {
-      HTML("<strong>Report file not found.</strong>")
-    }
+
+  # GitHub raw URLs for your files
+  xml_url <- "https://raw.githubusercontent.com/Roxy14/ShinyDemos/main/ODS/data/sample_iati.xml"
+  rmd_url <- "https://raw.githubusercontent.com/Roxy14/ShinyDemos/main/ODS/iati_analysis.Rmd"
+
+  # Download Rmd to a temp file
+  rmd_file <- tempfile(fileext = ".Rmd")
+  download.file(rmd_url, rmd_file, quiet = TRUE)
+
+  # Knit the report to a temp HTML file
+  out_file <- tempfile(fileext = ".html")
+  rmarkdown::render(
+    input = rmd_file,
+    output_file = out_file,
+    params = list(
+      iati_file = xml_url,
+      group_by = "recipient-country"
+    ),
+    envir = new.env(parent = globalenv())
+  )
+
+  # Make the folder containing the HTML accessible to Shiny
+  addResourcePath("reports", dirname(out_file))
+
+  # Show the report in an iframe
+  output$report_frame <- renderUI({
+    tags$iframe(
+      src = paste0("reports/", basename(out_file)),
+      width = "100%",
+      height = "900px",
+      style = "border:none;"
+    )
   })
 }
 
