@@ -4289,7 +4289,8 @@ df4.show()                            # action
                  tags$li(HTML("🔹 <b>Pandas</b> performs well up to ~1M rows but times out beyond 5M.")),
                  tags$li(HTML("🔹 <b>Polars</b> is consistently faster than Pandas and handles up to ~5M rows before timing out at 10M.")),
                  tags$li(HTML("🔹 <b>PySpark</b> has higher overhead for small datasets but scales extremely well, outperforming both Pandas and Polars at large sizes.")),
-                 tags$li("🔹 Results are reported in number of rows rather than file size because each engine stores the same data in very different internal formats, producing different memory footprints for identical datasets.")
+                 tags$li("🔹 File sizes are shown as CSV-equivalent estimates. Actual in‑memory size differs across engines because each uses its own internal data format.")
+                 
                )
                
                
@@ -5043,33 +5044,49 @@ id  category  date         amount
     )
   })
   
+  
+  
+  df <- data.frame(
+    num_rows = c(100, 1000, 10000, 100000, 1e6, 2e6, 5e6, 1e7),
+    pandas = c(0.03, 0.02, 0.08, 0.70, 8.15, 18.56, NA, NA),
+    polars = c(0.00, 0.01, 0.05, 0.45, 4.71, 9.79, 29.80, NA),
+    pyspark = c(2.12, 2.25, 1.92, 2.31, 3.56, 5.05, 8.28, 13.91)
+  )
+  
   output$benchmark_plot <- plotly::renderPlotly({
     
-    df <- data.frame(
-      num_rows = c(100, 1000, 10000, 100000, 1e6, 2e6, 5e6, 1e7),
-      pandas = c(0.03, 0.02, 0.08, 0.70, 8.15, 18.56, NA, NA),
-      polars = c(0.00, 0.01, 0.05, 0.45, 4.71, 9.79, 29.80, NA),
-      pyspark = c(2.12, 2.25, 1.92, 2.31, 3.56, 5.05, 8.28, 13.91)
+    data <- df
+    
+    sizes <- c(
+      "24 KB", "238 KB", "2.3 MB", "24 MB",
+      "238 MB", "480 MB", "1.18 GB", "2.33 GB"
     )
     
-    plot_ly(df, x = ~num_rows, y = ~pandas, type = "scatter", mode = "lines+markers",
+    data$label <- paste0(format(data$num_rows, big.mark=","), " (", sizes, ")")
+    
+    plot_ly(data, x = ~label, y = ~pandas, type = "scatter", mode = "lines+markers",
             name = "Pandas", line = list(color="#4da6ff")) %>%
       add_trace(y = ~polars, name = "Polars", mode = "lines+markers",
                 line = list(color="#66ff66")) %>%
       add_trace(y = ~pyspark, name = "PySpark", mode = "lines+markers",
                 line = list(color="#ff6666")) %>%
       layout(
-        xaxis = list(title = "Number of Rows", type = "category"),
+        xaxis = list(
+          title = "Number of Rows (with Equivalent File Size)",
+          categoryorder = "array",
+          categoryarray = data$label
+        ),
         yaxis = list(
           title = "Runtime (seconds)",
           type = "log",
           tickformat = ".2f",
           ticksuffix = "s"
         ),
-        legend = list(title=list(text="Engine"))
+        legend = list(title = list(text = "Engine"))
       )
-    
   })
+  
+
   
   
   
