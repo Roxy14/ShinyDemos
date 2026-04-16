@@ -40,29 +40,39 @@ learn_theme <- bs_theme(
 ui <- navbarPage(
   title = "Teach PySpark",
   theme = learn_theme,
-
+  
   header = tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
-
-    # ⭐ FIX: Make entire app background light so text is readable
+    
+    # ⭐ FIX: Make tab headers ALWAYS visible and readable
     tags$style(HTML("
       body, .container-fluid {
         background-color: #f7f9fb !important;
         color: #1a1a1a !important;
       }
 
-      /* Fix navbar active tab (remove bright blue) */
+      /* Inactive tab text — make visible */
+      .navbar-nav .nav-link {
+        color: #1a1a1a !important;
+        font-weight: 600;
+        opacity: 1 !important;
+      }
+
+      /* Hover state */
+      .navbar-nav .nav-link:hover {
+        color: #000 !important;
+        background-color: #e6e6e6 !important;
+        border-radius: 6px;
+      }
+
+      /* Active tab — clear highlight */
       .navbar-nav .nav-link.active {
-        background-color: #e0e0e0 !important;
+        background-color: #d0d0d0 !important;
         color: #000 !important;
         border-radius: 6px;
       }
 
-      .navbar-nav .nav-link {
-        font-weight: 600;
-      }
-
-      /* Ensure module content sits on a readable background */
+      /* Content panel background */
       .tab-pane {
         background-color: #ffffff !important;
         padding: 20px;
@@ -71,7 +81,7 @@ ui <- navbarPage(
       }
     "))
   ),
-
+  
   tabPanel("1. Let's Get Started!", homeUI("home")),
   tabPanel("2. Laying the Groundwork", basicsUI("basics")),
   tabPanel("3. Reactivity: How Shiny Updates Itself", reactiveExpressionsUI("reactive")),
@@ -88,7 +98,7 @@ ui <- navbarPage(
 # SERVER
 # ----------------------------------------------------
 server <- function(input, output, session) {
-
+  
   homeServer("home")
   basicsServer("basics")
   reactiveExpressionsServer("reactive")
@@ -96,7 +106,7 @@ server <- function(input, output, session) {
   observeEventServer("obsevent")
   reactiveOverviewServer("overview")
   reactiveFlowServer("flow")
-
+  
   reactiveMiniAppServer("mini")
   fileStructureServer("files")
   fullAppExampleServer("example")
