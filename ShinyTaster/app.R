@@ -38,7 +38,7 @@ learn_theme <- bs_theme(
 # UI
 # ----------------------------------------------------
 ui <- navbarPage(
-  title = "Teach PySpark",
+  title = "Shiny Taster",
   theme = learn_theme,
   
   header = tags$head(
