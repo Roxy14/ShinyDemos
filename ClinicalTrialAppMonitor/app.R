@@ -76,7 +76,7 @@ ui <- dashboardPage(
       value = Sys.Date() + 21
     ),
     
-    actionButton("refresh", "Recalculate", class = "btn-primary")
+    actionButton("refresh", "Go!", class = "btn-primary")
   ),
   
   dashboardBody(
