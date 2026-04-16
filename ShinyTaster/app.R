@@ -20,8 +20,8 @@ source("modules/observe_event.R")
 source("modules/reactive_flow.R")
 source("modules/reactive_overview.R")
 source("modules/mini_app.R")
-source("modules/file_structure.R")       # ⭐ NEW
-source("modules/full_app_example.R")     # ⭐ NEW
+source("modules/file_structure.R")
+source("modules/full_app_example.R")
 
 # Theme
 learn_theme <- bs_theme(
@@ -37,64 +37,40 @@ learn_theme <- bs_theme(
 # ----------------------------------------------------
 # UI
 # ----------------------------------------------------
-ui <- fluidPage(
+ui <- navbarPage(
+  title = "Teach PySpark",
   theme = learn_theme,
   
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+  # Remove bright blue active tab
+  header = tags$head(
+    tags$style(HTML("
+      .navbar-nav .nav-link.active {
+        background-color: #e0e0e0 !important;
+        color: #000 !important;
+        border-radius: 6px;
+      }
+      .navbar-nav .nav-link {
+        font-weight: 600;
+      }
+    "))
   ),
   
-  sidebarLayout(
-    sidebarPanel(
-      width = 3,
-      selectInput(
-        "topic",
-        "Choose a topic:",
-        choices = c(
-          "Let's Get Started!",
-          "Laying the Groundwork",
-          "Reactivity: How Shiny Updates Itself",
-          "Watching for Changes: observe()",
-          "Buttons & Triggers: observeEvent()",
-          "Putting It All Together",
-          "How UI and Server Connect",
-          "Mini App: Step‑by‑Step Reactive Plot",
-          "Complete Mini App Code Example",         # ⭐ NEW
-          "This Learning App File Structure"      # ⭐ NEW
-
-        )
-      )
-    ),
-    
-    mainPanel(
-      width = 9,
-      uiOutput("topic_ui")
-    )
-  )
+  tabPanel("1. Let's Get Started!", homeUI("home")),
+  tabPanel("2. Laying the Groundwork", basicsUI("basics")),
+  tabPanel("3. Reactivity: How Shiny Updates Itself", reactiveExpressionsUI("reactive")),
+  tabPanel("4. Watching for Changes: observe()", observeUI("obs")),
+  tabPanel("5. Buttons & Triggers: observeEvent()", observeEventUI("obsevent")),
+  tabPanel("6. Putting It All Together", reactiveOverviewUI("overview")),
+  tabPanel("7. How UI and Server Connect", reactiveFlowUI("flow")),
+  tabPanel("8. Mini App: Step‑by‑Step Reactive Plot", reactiveMiniAppUI("mini")),
+  tabPanel("9. Complete Mini App Code Example", fullAppExampleUI("example")),
+  tabPanel("10. This Learning App File Structure", fileStructureUI("files"))
 )
 
 # ----------------------------------------------------
 # SERVER
 # ----------------------------------------------------
 server <- function(input, output, session) {
-  
-  output$topic_ui <- renderUI({
-    switch(input$topic,
-           
-           "Let's Get Started!" = homeUI("home"),
-           "Laying the Groundwork" = basicsUI("basics"),
-           "Reactivity: How Shiny Updates Itself" = reactiveExpressionsUI("reactive"),
-           "Watching for Changes: observe()" = observeUI("obs"),
-           "Buttons & Triggers: observeEvent()" = observeEventUI("obsevent"),
-           "Putting It All Together" = reactiveOverviewUI("overview"),
-           "How UI and Server Connect" = reactiveFlowUI("flow"),
-           
-           "Mini App: Step‑by‑Step Reactive Plot" = reactiveMiniAppUI("mini"),
-           "Complete Mini App Code Example" = fullAppExampleUI("example"),      # ⭐ NEW
-           "This Learning App File Structure" = fileStructureUI("files")       # ⭐ NEW
-
-    )
-  })
   
   homeServer("home")
   basicsServer("basics")
@@ -105,8 +81,8 @@ server <- function(input, output, session) {
   reactiveFlowServer("flow")
   
   reactiveMiniAppServer("mini")
-  fileStructureServer("files")          # ⭐ NEW
-  fullAppExampleServer("example")       # ⭐ NEW
+  fileStructureServer("files")
+  fullAppExampleServer("example")
 }
 
 shinyApp(ui, server)
